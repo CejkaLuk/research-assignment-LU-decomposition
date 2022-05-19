@@ -56,6 +56,11 @@
 \newcommand{\ti}{\textit} % Shortcut for cursive font
 \newcommand{\tb}{\textbf} % Shortcut for bold fond
 
+%% Status of writing:
+\newcommand{\TODO}{\textcolor{red}{TODO}}   		   % To Do command
+\newcommand{\ENGLISH}{\textcolor{green}{ENGLISH}}      % Writing To Be Checked by someone who knows English grammar
+\newcommand{\SUPERVISOR}{\textcolor{blue}{SUPERVISOR}} % Writing To Be Checked by Supervisor (Tomas Oberhuber)
+
 
 %%% Constants
 \newcommand{\cvut}{České vysoké učení technické v Praze}
@@ -271,62 +276,16 @@ V \place\ dne .................... &........................................ \\ 
 %|         The PAPER ITSELF begins here                 |
 %--------------------------------------------------------
 
-\chapter*{Introduction}				 		 % DO NOT TOUCH!
-\addcontentsline{toc}{chapter}{Introduction} % DO NOT TOUCH!
+\include{preface}
 
-Put my introduction text here (1-3 pages, do not divide it into sub-pages) or insert it from a separate file using: \texttt{\textbackslash input\{introduction.tex\}}.
-% TODO: If the input file includes the command "\chapter{...}" then remove the one a few lines above
+\include{ch1_theory}
+\include{ch2_implementation}
+\include{ch3_benchmark-results}
 
+\include{conclusion}
 
+\include{bibliografie}
 
-\chapter{Title of first chapter}
-Put the text of your first chapter here, or insert it from a separate file using: \texttt{\textbackslash input\{chpater\_one.tex\}}.
-% TODO: If the input file includes the command "\chapter{...}" then remove the one a few lines above
-
-
-
-
-\chapter*{Conclusion} % DO NOT TOUCH!
-\addcontentsline{toc}{chapter}{Conclusion} % DO NOT TOUCH!
-
-Put my conclusion text here (1-3 pages, do not divide it into sub-pages) or insert it from a separate file using: \texttt{\textbackslash input\{conclusion.tex\}}.
-
-
-
-
-%%%%%%%%%%%% BIBLIOGRAPHY %%%%%%%%%%%%
-\clearpage  							   	 % DO NOT TOUCH!
-\addcontentsline{toc}{chapter}{Bibliography} % DO NOT TOUCH!
-
-\begin{thebibliography}{3}
-	% Format: ČSN ISO 690. It can be generate using http://www.citacepro.com - it can generate TeX
-	% Ordering: Alphabetical according to author (from the first word if the author is not known)
-	% \bibitem{link} Author. \ti{Title of item}. City. Publisher. Year.
-	\bibitem{Sharma2019}
-	SHARMA, Bharatkumar a Jaegeun HAN. \textit{Learn CUDA Programming: A beginner's guide to GPU programming and parallel computing with CUDA 10.x and C/C++}. Birmingham: Packt Publishing, 2019. ISBN 978-1788996242.
-	\bibitem{Saad2003}
-	SAAD, Y. \textit{Iterative methods for sparse linear systems}. 2nd ed. Philadelphia: Society for Industrial and Applied Mathematics, 2003. ISBN 978-0898715347.
-	\bibitem{Anzt2019}
-	ANZT, Hartwig, Tobias RIBIZEL, Goran FLEGAR, Edmond CHOW a Jack DONGARRA. \ti{ParILUT - A Parallel Threshold ILU for GPUs}. In: 2019 IEEE International Parallel and Distributed Processing Symposium (IPDPS) [online]. IEEE, 2019, 2019, s.~231-241 [cit. 2021-03-16]. ISBN 978-1-7281-1246-6. Dostupné z: doi:10.1109/IPDPS.2019.00033
-	
-\end{thebibliography}
-
-
-
-
-%%%%%%%%%%%% WORK ATTACHMENTS %%%%%%%%%%%%
-\newpage 									% DO NOT TOUCH!
-\addcontentsline{toc}{chapter}{Attachments}	% DO NOT TOUCH!
-\appendix 								 	% DO NOT TOUCH!
-
-
-%%%%%%%%%%%% Attachment A (1st chapter in terms of attachments) %%%%%%%%%%%%
-
-\chapter{Title of first attachment}
-Write the text for your first attachment here, or insert it using: \texttt{\textbackslash input\{attachment\_A.tex\}}.
-% TODO: If the input file includes the command "\chapter{...}" then remove the one a few lines above
-
-
-
+\include{attachments}
 
 \end{document}
