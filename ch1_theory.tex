@@ -2,13 +2,13 @@
 % - Go through quoting in the text, for example: so-called "", '' or just \emph{text} or \textit{text} === MUST BE CONSISTENT
 % - Go through numbering in the text, use either words: one, two, or numbers: 1, 2
 
-\chapter{Theory \TO}
+\chapter{Theory}
 This chapter will present the core theory of areas used in this research assignment. Firstly, Graphical Processing Units (GPUs) will be introduced with an emphasis on the architecture of GPUs (only Nvidia GPUs as the Nvidia API, CUDA, was used to develop this project). Then, CUDA, will be described in greater detail. Finally, the theory behind Lower-Upper (LU) Decomposition will be presented.
 
-\section{GPUs \TO}
+\section{GPUs}
 From an average consumer's perspective a Graphics Processing Unit (GPU) is a component of a computing system that performs graphical operations, for example, processing images. For the sake of the example, let image processing be simplified into the following: images are composed of pixels and each pixel needs to be processed. Since a GPU contains thousands of processing units it can perform a large number of operations in parallel, for example, processing a large number of pixels at once, thus making it highly efficient at image processing. While this has a wide range of uses, there is another field where the highly-parallel nature of the GPU can be utilized: General-Purpose Computing on Graphics Processing Units (GPGPU).
 
-\subsection{General-Purpose Computing on Graphics Processing Units (GPGPU) \TO}
+\subsection{General-Purpose Computing on Graphics Processing Units (GPGPU)}
 As described in section 1.2 of the author's bachelor thesis \textit{Formats for storage of sparse matrices on GPU} \cite{Cejka2020}, GPUs started to evolve at the turn of the 21st century from purely graphics-processing units into devices capable of general-purpose computing, i.e. computation that is not necessarily related to graphics. The significance of this event lies in the use of graphics cards for seemingly any parallelizable computational task that would benefit from the abundance of slower processing units on a GPU rather than fewer faster processing units found on a CPU \cite{NVIDIAMay2022}.
 
 \par For reference, high-end desktop CPUs today usually have anywhere from 8 to 16 cores, while server CPUs can have upwards of 64 cores (not counting hyper-threading and similar technologies). In general, CPUs with more cores have a lower clock speed - see figure~\ref{Figure:processor-comparison} for a selection of processors along with their core count and clock speeds \cite{Glawion7March2022}.
@@ -130,11 +130,11 @@ In summary, professional cards are heavily preferred when it comes to GPGPU, how
 
 
 
-\section{Compute Unified Device Architecture (CUDA) \TO}\label{Section:CUDA}
+\section{Compute Unified Device Architecture (CUDA)}\label{Section:CUDA}
 The Compute Unified Device Architecture (CUDA) is programming model, sometimes referred to as a parallel computing platform, introduced by Nvidia in 2006 \cite{Oh10September2012}. It is designed to give developers low-level access to GPU hardware, for example, fine-tuning assignment of processing units or memory allocation, thus, allowing them to utilize the full potential of GPUs and tailor their use for specific applications. CUDA supports a variety of programming languages, for example, C++ (used in this project) and Fortran, however, adaptations for other languages such as, Python, Perl, Java, Ruby, MATLAB, Julia, etc. have been created \cite{OsGyRFLMngy0j8Pv}.
 \par This section will first explain some basic terminology followed by the theory behind CUDA from the simplest concept - a thread - to how threads are managed. Then, memory will be introduced in a similar manner: from per-thread local memory to global memory. Subsequently, asynchronous concurrent execution will be described. Finally, basic CUDA extensions of the C++ language will be presented and their translation into the thread and memory management systems will be shown on a simple example program.
 
-\subsection{Introductory terminology \TO}\label{Subsection:CUDA-introductory-terminology}
+\subsection{Introductory terminology}\label{Subsection:CUDA-introductory-terminology}
 CUDA introduces many unique concepts that come with their own naming scheme. This subsection will list and explain some basic terminology that will be used throughout the project \cite{Ruetsch2008}:
 \begin{itemize}
 	\item \textbf{Host} - Central Processing Unit (CPU) and its memory. The host provides data to GPU and instructs it to execute various instructions.
@@ -142,7 +142,7 @@ CUDA introduces many unique concepts that come with their own naming scheme. Thi
 	\item \textbf{Kernel} - term used for a special type of function that, unlike regular functions, can only be called from the host and executed on the device. Furthermore, when a CUDA kernel is called it is executed in parallel across a number of threads.	
 \end{itemize}
 
-\subsection{Thread Management \TO}\label{Subsection:thread-management}
+\subsection{Thread Management}\label{Subsection:thread-management}
 This subsection will aim to describe how CUDA handles its basic execution units: threads. First, a thread itself will be defined and described followed by explanations of multiple encompassing thread structures.
 
 \paragraph{CUDA thread}
@@ -182,7 +182,7 @@ A visualization of CUDA's thread structuring can be seen in figure~\ref{Figure:C
 \end{figure}
 
 
-\subsection{Memory Management \TO}\label{Subsection:memory-management}
+\subsection{Memory Management}\label{Subsection:memory-management}
 The aim of this subsection is to present how memory management works in CUDA. Different types of memory available on the GPU will be presented, ranging from per-thread local to global memory.
 
 \paragraph{Per-thread local memory}
@@ -414,7 +414,7 @@ Further caveats associated with the use of mapped memory can be found in \emph{C
 	\label{Figure:Nvidia-GPU-structure-CUDA-thread-structure}
 \end{figure}
 
-\subsection{Asynchronous concurrent execution \TO}\label{Subsection:CUDA-asynchronous-concurrent-execution}
+\subsection{Asynchronous concurrent execution}\label{Subsection:CUDA-asynchronous-concurrent-execution}
 Within CUDA there are multiple operations that can be executed at the same time (concurrently) - namely \cite{NVIDIAMay2022}:
 \begin{itemize}
 	\item Computation on the host
@@ -468,7 +468,7 @@ The last limitation - device resources - is not as severe the previous 2 since k
 In terms of memory, an example of kernels that will often not run concurrently with other kernels are ones that require large amounts of local memory \cite{NVIDIAMay2022}. In terms of threads, the limiting factor is the maximum number of active threads - described at the end of the \textit{Grid} paragraph in Subsection~\ref{Paragraph:CUDA-thread-management-grid}. For example, if 2 kernels are to be run concurrently, the total number of threads required by them at once must not exceed the maximum number of active threads on the device. \\
 Therefore, whether kernels can be run concurrently is highly dependent on the resource requirements of each kernel and it is up to the device to manage all of these operations.
 
-\subsubsection{Streams \TO}\label{Subsubsection:CUDA-asynchronous-concurrent-execution-concurrent-streams}
+\subsubsection{Streams}\label{Subsubsection:CUDA-asynchronous-concurrent-execution-concurrent-streams}
 Streams can be used to effectively create and manage concurrency on the device, in other words, they are the means by which the above-mentioned operations are controlled. According to \emph{CUDA C/C++ Streams and Concurrency} by Steve Rennich and Nvidia a CUDA \textit{stream} can be defined as "A sequence of operations that execute in issue-order on the GPU" \cite{sk7jHd5INXJOAEUe}. To put it another way, a single stream is basically an open door through which instructions can be sent to the device - kernels. \\
 While it is possible to have multiple streams active at once, the device has limited resource available (active threads and memory). Therefore, multiple active streams at once does not necessarily mean multiple kernels running simultaneously. Nevertheless, if multiple streams are active and each is given a different kernel, then these kernels can be executed concurrently if the device's limits are not overstepped - detailed above in paragraph \textit{Concurrent kernel execution} in Section\ref{Paragraph:CUDA-asynchronous-concurrent-execution-concurrent-kernel-execution}. \\
 Unlike individual kernels, global memory is used by all streams without division, i.e. all streams have access to the same global memory and there is no part of global memory that would belong to a particular stream. \\
@@ -544,7 +544,7 @@ Furthermore, there are certain operations that require a dependency check \cite{
 Thus, in order to improve application performance, Nvidia recommends developers issue all independent operations before dependent operations and delay any synchronization until necessary.
 
 
-\subsection{C++ CUDA Extensions \TO}\label{Subsection:CUDA-C++-extensions}
+\subsection{C++ CUDA Extensions}\label{Subsection:CUDA-C++-extensions}
 As previously mentioned at the beginning of Subsection~\ref{Section:CUDA}, CUDA supports a variety of programming languages. Among them is C++, a widely-used, high-performance C-based language that implicitly allows low-level memory manipulation. CUDA provides many different extensions to C++, however, for the purpose of this project only the core basics that were used during its development along with some other important extensions will be detailed. \\
 This subsection will divided into 2 main categories: outer-kernel and inner-kernel extensions. The former is made up of memory-related operations (allocating, copying and freeing data), kernel launch configurations, function extensions, streams, etc. - i.e. extensions not used within kernels. The latter consists of any operators, structures and declarations that are used in kernels.
 
@@ -649,7 +649,7 @@ In the part above, the \code{\_\_global\_\_} modifier was introduced as a specif
 
 If no modifier is included for a function, it is compiled for the host only. However, if both \code{\_\_device\_\_} and \code{\_\_host\_\_} are specified for a function, then it is compiled both for the host and for the device. The complete list of modifiers can be found in \emph{CUDA C++ Programming Guide} \cite{NVIDIAMay2022}.
 
-\subsubsection{Inter-kernel extensions \TO}
+\subsubsection{Inter-kernel extensions}
 This category comprises of variables, structures and operations etc. that are most often used within a kernel. First, the means by which developers are able to identify individual threads will be detailed. Then, different memory-type identifiers will be briefly presented along with established operations used to avoid erroneous behaviors in kernels.
 
 \paragraph{Thread identification}
@@ -709,7 +709,7 @@ Some memory space specifiers described in above in paragraph \textit{Memory mana
 In paragraph \textit{Shared memory} in Subsection~\ref{Paragraph:CUDA-memory-management-shared-memory}, it was mentioned that threads of a block are able to share data purely among each other. However, this advantage can also bring problems, such as, some threads overwriting data that other threads have not finished using, or, some threads reading data that other threads have not yet written - known as a \textit{race condition} \cite{Harris28January2013}. CUDA addresses this issue by enabling the synchronization of threads in a block which can be done by calling the built-in function: \code{\_\_syncthreads()}. This function can seen as a meeting checkpoint for all threads of a particular block, i.e., threads of a block will wait at this point until every single thread in their block has finished their work until this point. To put it more clearly: threads of a block are halted on the the line in code that contains \code{\_\_syncthreads()} until all threads of the block arrive to at it \cite{NVIDIAMay2022}.
 
 
-\subsection{Matrix multiplication \TO}\label{Subsection:matrix-multiplication}
+\subsection{Matrix multiplication}\label{Subsection:matrix-multiplication}
 In order to consolidate how CUDA can be used to accelerate the execution of a simple task, such as matrix multiplication, this subsection will present solutions to this task from Nvidia's \emph{CUDA C++ Programming Guide} \cite{NVIDIAMay2022}. Furthermore, for the purpose of showcasing and stressing the importance of abiding by Nvidia's recommendations when it comes to best practices and optimal performance, 2 examples will be presented. The first example will only use global memory to read the input matrix and write the resulting matrix, i.e. without shared memory. On the other hand, the second example will use shared memory to minimize accessing global memory. \\
 It is important to note that neither example is fully functional as the logic of some functions has been omitted due to unnecessary complexity and irrelevance to showcasing the capabilities of CUDA. In other words, the code shown will not compile, nor will it run - the full code can be found in Nvidia's \emph{CUDA C++ Programming Guide} \cite{NVIDIAMay2022}. The full working example (\code{matrixMul.cu}) encompassed by the build automation tool \code{make} can be unpacked during the installation of a CUDA toolkit. \\
 Before introducing the specifics of each example, their similarities will be presented. \\
@@ -790,7 +790,7 @@ void MatMul( const Matrix A, const Matrix B, Matrix C )
 
 The \code{Matrix} structure and \code{MatMul} function conclude the equivalent part of the examples.
 
-\subsubsection{Example without shared memory \TO}
+\subsubsection{Example without shared memory}
 The first example uses only global memory access, i.e. without shared memory. This means that the kernel - invoked on line 31 in Listing~\ref{Listing:CUDA-matrix-multiplication-host-mat-mul-function} - receives the \code{Matrix} structures stored in global memory and each thread reads from and writes to the same global memory whenever they need to. \\
 The kernel is launched on a grid of thread such that each thread is responsible for calculating exactly 1 element of the resulting \code{C} matrix. For example, let there be a thread with indices \code{row\_id} and \code{col\_id}. This thread will perform element-wise multiplication of row \code{row\_id} from matrix \code{A} and column \code{col\_id} from matrix \code{B}. Then, it will store the sum of these elements as the resulting value \code{C(row\_id, col\_id)} into matrix \code{C}. \\
 The visualization of this approach is shown in Figure~\ref{Figure:CUDA-matrix-multiplication-without-shared-memory-example} and the kernel is presented in Listing~\ref{Listing:CUDA-matrix-multiplication-without-shared-memory-example}.
@@ -820,7 +820,7 @@ __global__ void MatMulKernel( Matrix A, Matrix B, Matrix C )
 As can be seen in Listing~\ref{Listing:CUDA-matrix-multiplication-without-shared-memory-example}, each thread performs \code{A.width + B.height} reads from global memory when calculating its \code{Cvalue}. Since CUDA threads are executed simultaneously in a warp of 32 threads, the memory access to global memory should be coalesced for the threads within each warp. Nevertheless, this kernel is sub-optimal as accessing global memory is considered sub-optimal when avoidable.
 \par At the end of the introduction to Subsection~\ref{Subsection:matrix-multiplication}, it was mentioned that in order to eliminate the "matrix dimensions being multiples of \code{BLOCK\_SIZE}" requirement, the kernel would need to include a boundary condition. In this example, the condition would be simply to allocate an extra column and row of thread blocks to the grid. This would mean that the last row and column of blocks would overlap the dimensions of the matrix. Then, the kernel would be terminated for threads that are outside the matrix dimensions, i.e. if either \code{row} is greater than \code{A.height} or \code{col} is greater than \code{B.width}. However, it is noteworthy that this will result in thread divergence, even though in this instance it will not have a large impact on overall performance as one of the execution paths would be a simple \code{return} statement.
 
-\subsubsection{Example with shared memory \TO}
+\subsubsection{Example with shared memory}
 The second example uses both global and shared memory. Similarly to the approach without using shared memory, each thread is responsible for calculating a single element of the resulting \code{C} matrix. However, in this example, each thread is also responsible for loading elements of matrices \code{A} and \code{B} from global memory into shared memory. Thus, shared memory is the primary means of obtaining elements for calculations. Overall, the calculation is changed from each thread calculating its individual element to a block of threads iterating over sub-matrices of \code{A} and \code{B}. \\
 \par In order to make use of shared memory, matrix \code{C} is divided into sub-matrices of \code{BLOCK\_SIZE x BLOCK\_SIZE} elements ($ \mathbb{C}_{sub} $). Then, each sub-matrix $ \mathbb{C}_{sub} $ is computed by a single thread block; each thread within a thread block is responsible for the computation of an element in $ \mathbb{C}_{sub} $. In the previous approach, each thread performed element-wise multiplication of a row and a column to form a resulting element of matrix \code{C} - effectively a multiplication of an \code{1xn} and \code{nx1} matrix. The approach with shared memory expands this concept to blocks. In other words, the sub-matrix $ \mathbb{C}_{sub} $ is a result of multiplying 2 rectangular sub-matrices of \code{A} and \code{B} (illustrated in Figure~\ref{Figure:CUDA-matrix-multiplication-with-shared-memory-example}) - denoted $ \mathbb{A}_{rect} $ and $ \mathbb{B}_{rect} $ for the purpose of this explanation:
 
@@ -912,7 +912,7 @@ Unlike the previous example, the code shown in Listing~\ref{Listing:CUDA-matrix-
 
 This solution ensures correct results and avoids a case of thread divergence in the main loop which would occur multiple times during the computation. However, the thread divergence will still occur when deciding which value to load from global memory and when terminating the kernel for some threads. Nevertheless, similarly to the previous approach, in this instance thread divergence will not have a large impact on overall performance as one of the execution paths would be a simple assignment operation in the first condition and a \code{return} statement in the second condition.
 
-\subsubsection{Comparison of both examples \TO}\label{Subsubsection:matrix-multiplication-comparison-of-examples}
+\subsubsection{Comparison of both examples}\label{Subsubsection:matrix-multiplication-comparison-of-examples}
 In order to show the performance difference, benchmarks for both examples using single precision were run on a set of matrices with varying dimensions - from 160 by 160 to 16000 by 16000. The hardware and software specifications of the machine used for the benchmarks can be found in Table~\ref{Table:CUDA-matrix-multiplication-benchmark-system}. Furthermore, the full code can be found in Attachment~\ref{Attachment:CUDA-matrix-multiplication-code}.
 
 \begin{table}[h]
@@ -1013,7 +1013,7 @@ As can be seen in Figure~\ref{Figure:CUDA-matrix-multiplication-benchmark-result
 
 
 
-\section{LU Decomposition \TO}
+\section{LU Decomposition}
 It can be argued that, in recent years, computational systems and software layers allowing developers to use them to their full potential have developed significantly - Nvidia GPUs and CUDA. Subsequently, many novel uses have been found for such powerful computing systems, especially in areas that require results to be available quickly on demand. An example of such an area is solving systems of linear equations. Being one of the fundamental parts of numerical linear algebra, the requirement for their solution arises not only in computer science, but also in physics, engineering, chemistry, etc. \\
 While there are many different methods capable of solving a system comprising of more than one linear equation, in this project, Lower-Upper (LU) decomposition will be detailed. \\
 In order to show how LU decomposition can be used to solve a simple system of linear equations an example will be presented. 
@@ -1135,7 +1135,7 @@ It is noteworthy that since the values on the right-hand side (vector $ \textbf{
 
 In summary, from the steps above, it can argued that the \textit{decomposition algorithm} mentioned in step 2 is one of the key components of the procedure and as such it will be the main topic of this project.
 
-\subsection{Crout method \TO}\label{Subsection:LU-decomposition-crout-method}
+\subsection{Crout method}\label{Subsection:LU-decomposition-crout-method}
 This subsection aims to explain in greater detail the decomposition algorithm mentioned above in step 2. There are many different procedures to decompose matrix $ \mathbb{A} $ into matrices $ \mathbb{L} $ and $ \mathbb{U} $ such that $ \mathbb{A} = \mathbb{LU} $. One such procedure, developed by Prescott Durand Croutis, is the \textit{Crout method} - sometimes also referred to as \textit{Crout matrix decomposition} or \textit{Crout factorization} \cite{Press2007}. \\
 This method differs from similar procedures in that the resulting $ \mathbb{U} $ matrix is a unit upper triangular matrix, while $ \mathbb{L} $ remains to be a lower triangular matrix. A unit triangular matrix differs from a regular triangular matrix in that its main diagonal is comprised solely of ones. In other words, all elements on the main diagonal of $ \mathbb{U} $ are equal to $ 1 $ ($ u_{11} = u_{22} = u_{33} = 1 $):
 
@@ -1204,7 +1204,7 @@ void crout_method(A, L, U) {
 	\label{Figure:LU-decomposition-crout-method-visualisation}
 \end{figure}
 
-\subsection{Numerical method \TO}\label{Subsection:LU-decomposition-numerical-method}
+\subsection{Numerical method}\label{Subsection:LU-decomposition-numerical-method}
 When solving systems of linear equations there are 2 main groups of methods:
 
 \begin{enumerate}
