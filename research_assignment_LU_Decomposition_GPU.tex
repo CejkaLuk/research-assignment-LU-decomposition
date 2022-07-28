@@ -1,9 +1,5 @@
 \documentclass[12pt,a4paper,oneside,czech,american]{book} % TODO: Update 'oneside' or 'twoside' - depending on number of pages
 
-%%% TODO:
-% * Create bibliography file? Can we do custom source format?
-% * Create tex files for chapters - see Juriad or MAK2 essay for examples
-
 %%% Packages:
 %% Necessary packages:
 \usepackage[T1]{fontenc}		% Font encoding
@@ -17,13 +13,20 @@
 % Fonts:
 \usepackage[hidelinks]{hyperref} % Hide square around URL link.
 \usepackage{amsmath}  			 % Advanced mathematic package
-\usepackage{color}    			 % Colorful text
+\usepackage{xcolor}    			 % Colorful text
+\usepackage{soul}				 % Text fonts syllable by syllable - used for in-text codifying
+\usepackage{amsfonts}			 % Font package permitting the use of \mathbb{}, among other functionalities
 
 % Graphics:
 \usepackage{graphicx} 			 % Insert raster graphic files (PNG etc.)
 \usepackage{epsfig} 			 % Insert EPS graphics files
 \usepackage{float} 			  	 % Advanced figure placement options
-\usepackage{caption} 			 % Captions of figure, tables, etc.
+\usepackage{caption} 			 % Captions of figures, tables, etc.
+\usepackage{subcaption}			 % Sub-captions of figures, tables, etc. 
+\usepackage{tikz}				 % Visual representation of matrices, graphs etc.
+\usetikzlibrary{plotmarks, positioning}
+\usepackage{pgfplots} 			% For visualizations, graphics, etc.
+\pgfplotsset{compat=1.3}		% Use pgfplots version 1.3 specifically
 
 % Languages:
 \usepackage{babel}
@@ -34,6 +37,7 @@
 
 % Tables:
 \usepackage{tabularx}			 % Advanced table options
+\usepackage{colortbl} 			 % Table cell color
 
 %%% Document settings:
 % TODO: Play around with the following if the formatting of pages turns out weird
@@ -52,14 +56,71 @@
 \parskip=7pt   		  % Spacing between paragraphs
 
 
+%%% Custom colors:
+\definecolor{nvidia}{rgb}{0.6, 0.73, 0.35}		% Nvidia color
+\definecolor{lightnvidia}{rgb}{0.92, 1.0, 0.85} % Nvidia light color
+\definecolor{light-gray}{gray}{0.95}			% In-text code highlighting color
+\definecolor{lbcolor}{rgb}{0.9,0.9,0.9}			% Code block background color
+\definecolor{Darkgreen}{rgb}{0.0, 0.2, 0.13}	% Code block comments color
+
+
+%%% Custom code block:
+\lstset{
+	backgroundcolor=\color{lbcolor}, % Background color of the code block
+	upquote=true,					 % Format of quote: true -> '', false -> ‘’
+	columns=fixed,					 % Characters are below each other (each column is one character -> fixed column size)
+	extendedchars=false,			 % Allow national characters, for example, Czech diacritics. If true, then load any package that defines the characters, for example, fontenc, or inputenc, etc.
+	showtabs=false,					 % Tabulators visible or not
+	showspaces=false,				 % All blank spaces visible as _ or not
+	showstringspaces=false,			 % Blank spaces in strings visible as _ or not 
+	identifierstyle=\ttfamily,		 % Code font to be monospace if the line begins with one of the following: a-z, A-Z, @, $ and _
+	language=C++,					 % Default language syntax highlighting for code blocks
+	captionpos=b,					 % Position of the caption. b - bottom; t - top of the listing
+	tabsize=2,						 % Set tabulator stops			
+	frame=lines,					 % Draw a line on the top and bottom of the code listing -> frame
+	numbers=left,					 % Print line numbers on the left of the code block
+	numberstyle=\tiny,				 % Font and size of line numbers
+	numbersep=5pt,					 % Distance between line numbers and the code block
+	basicstyle=\footnotesize,		 % Basic font. Selected at the beginning of each listing
+	keywordstyle=\color[rgb]{0,0,1}, % Fond of language keywords in a specific font
+	commentstyle=\color{Darkgreen},	 % Font of comments in code block
+	stringstyle=\color{red},		 % Font of non-keywords, comments and strings
+	breaklines=true,				 % Breaking of long lines
+	prebreak = \raisebox{0ex}[0ex][0ex]{\ensuremath{\hookleftarrow}}, % Line-break symbol if a line of code is too long
+}
+% Extend C++ with CUDA keywords - not supported in lstlisting by default.
+\lstset{
+	morekeywords={__global__},
+	morekeywords={__device__},
+	morekeywords={blockDim.x},
+	morekeywords={blockDim.y},
+	morekeywords={blockIdx.x},
+	morekeywords={blockIdx.y},	
+	morekeywords={threadIdx.x},
+	morekeywords={threadIdx.y},
+	morekeywords={gridDim.x},
+	morekeywords={__shared__},
+	morekeywords={dim3},
+	alsoletter={.}				% Make the font be applied for dots
+}
+
+
 %%% Custom commands:
-\newcommand{\ti}{\textit} % Shortcut for cursive font
-\newcommand{\tb}{\textbf} % Shortcut for bold fond
+\newcommand{\ti}{\textit} 								  % Shortcut for cursive font
+\newcommand{\tb}{\textbf} 								  % Shortcut for bold fond
+%\newcommand{\code}[1]{%									  % Shortcut for code font in text
+%	\begingroup
+%	\sethlcolor{light-gray}%
+%	\hl{\texttt{#1}}%
+%	\endgroup
+%}
+
+\newcommand{\code}[1]{\colorbox{light-gray}{\texttt{#1}}}
 
 %% Status of writing:
 \newcommand{\TODO}{\textcolor{red}{TODO}}   		   % To Do command
 \newcommand{\ENGLISH}{\textcolor{green}{ENGLISH}}      % Writing To Be Checked by someone who knows English grammar
-\newcommand{\SUPERVISOR}{\textcolor{blue}{SUPERVISOR}} % Writing To Be Checked by Supervisor (Tomas Oberhuber)
+\newcommand{\TO}{\textcolor{nvidia}{TO}} 				   % Writing To Be Checked by Supervisor (Tomas Oberhuber)
 
 
 %%% Constants
@@ -284,7 +345,7 @@ V \place\ dne .................... &........................................ \\ 
 
 \include{conclusion}
 
-\include{bibliografie}
+\include{bibliography}
 
 \include{attachments}
 
