@@ -13,8 +13,9 @@
 % Fonts:
 \usepackage[hidelinks]{hyperref} % Hide square around URL link.
 \usepackage{amsmath}  			 % Advanced mathematic package
-\usepackage{color}    			 % Colorful text
+\usepackage{xcolor}    			 % Colorful text
 \usepackage{soul}				 % Text fonts syllable by syllable - used for in-text codifying
+\usepackage{amsfonts}			 % Font package permitting the use of \mathbb{}, among other functionalities
 
 % Graphics:
 \usepackage{graphicx} 			 % Insert raster graphic files (PNG etc.)
@@ -24,12 +25,8 @@
 \usepackage{subcaption}			 % Sub-captions of figures, tables, etc. 
 \usepackage{tikz}				 % Visual representation of matrices, graphs etc.
 \usetikzlibrary{plotmarks, positioning}
-
-%%% TEMP:
-\usepackage{pgfplots}
-\pgfplotsset{compat=1.3}
-\usepackage{xcolor}
-\usepackage{array}
+\usepackage{pgfplots} 			% For visualizations, graphics, etc.
+\pgfplotsset{compat=1.3}		% Use pgfplots version 1.3 specifically
 
 % Languages:
 \usepackage{babel}
