@@ -23,10 +23,11 @@
 \usepackage{float} 			  	 % Advanced figure placement options
 \usepackage{caption} 			 % Captions of figures, tables, etc.
 \usepackage{subcaption}			 % Sub-captions of figures, tables, etc. 
-\usepackage{tikz}				 % Visual representation of matrices, graphs etc.
-\usetikzlibrary{plotmarks, positioning}
-\usepackage{pgfplots} 			% For visualizations, graphics, etc.
-\pgfplotsset{compat=1.3}		% Use pgfplots version 1.3 specifically
+\usepackage{nicematrix, tikz}	 % Visual representation of matrices, graphs etc. - 'nicematrix' is experimental
+\usetikzlibrary{plotmarks, positioning, fit}
+\usetikzlibrary{decorations.pathreplacing, matrix, calc} % EXPERIMENTAL
+\usepackage{pgfplots} 			 % For visualizations, graphics, etc.
+\pgfplotsset{compat=1.3}		 % Use pgfplots version 1.3 specifically
 
 % Languages:
 \usepackage{babel}
@@ -34,6 +35,9 @@
 % Page formatting:
 % TODO: Replace placeholder PDF with scan of orignal task paper
 \usepackage{pdfpages}			 % Add PDFs into compiled PDF
+
+% Referencing:
+\usepackage{footmisc} 			 % Refer to footnotes that already exist
 
 % Tables:
 \usepackage{tabularx}			 % Advanced table options
