@@ -35,7 +35,6 @@
 \usepackage{babel}
 
 % Page formatting:
-% TODO: Replace placeholder PDF with scan of orignal task paper
 \usepackage{pdfpages}			 % Add PDFs into compiled PDF
 
 % Referencing:
@@ -111,19 +110,12 @@
 %%% Custom commands:
 \newcommand{\ti}{\textit} 								  % Shortcut for cursive font
 \newcommand{\tb}{\textbf} 								  % Shortcut for bold fond
-%\newcommand{\code}[1]{%									  % Shortcut for code font in text
-%	\begingroup
-%	\sethlcolor{light-gray}%
-%	\hl{\texttt{#1}}%
-%	\endgroup
-%}
 
 \newcommand{\code}[1]{\colorbox{light-gray}{\texttt{#1}}}
 
 %% Status of writing:
 \newcommand{\TODO}{\textcolor{red}{TODO}}   		   % To Do command
-\newcommand{\ENGLISH}{\textcolor{green}{ENGLISH}}      % Writing To Be Checked by someone who knows English grammar
-\newcommand{\TO}{\textcolor{nvidia}{TO}} 				   % Writing To Be Checked by Supervisor (Tomas Oberhuber)
+\newcommand{\TO}{\textcolor{nvidia}{TO}} 			   % Writing To Be Checked by Supervisor (Tomas Oberhuber)
 
 
 %%% Constants
@@ -142,20 +134,18 @@
 \newcommand{\titleEN}{Parallel LU Decomposition for the GPU} % English title of the project
 \newcommand{\paperAuthor}{Bc. Lukáš Čejka}   				 % Name and surname, including academic titles
 \newcommand{\supervisor}{doc. Ing. Tomáš Oberhuber, Ph.D.} 	 % Name and surname of supervisor, including academic titles
-\newcommand{\supervisorWorkspace}{\ksi, \fjfi, \cvut} 			 % Workplace of supervisor
+\newcommand{\supervisorWorkspace}{\ksi, \fjfi, \cvut} 		 % Workplace of supervisor
 
-% TODO: Can Klinkovsky be considered a consultant?
 \newcommand{\consultant}{--} 								 % Consultant's name, surname and academic titles, if I have a consultant
-\newcommand{\consultantWorkspace}{--} 							 % Consultant's workplace, if I have a consultant
+\newcommand{\consultantWorkspace}{--} 						 % Consultant's workplace, if I have a consultant
 
-\newcommand{\yearSubmitted}{2022}  									 % Year of handing in the thesis (not the academic years)
+\newcommand{\yearSubmitted}{2022}  							 % Year of handing in the thesis (not the academic years)
 \newcommand{\place}{Praze} 									 % City of studying
 
-% TODO: Fill in the following at the end
-\newcommand{\keywordCZ}{Klíčová slova}   						 % Enter 5 keywords max. in Czech
-\newcommand{\keywordEN}{Key words}       						 % Enter 5 keywords max. in English (translations of the Czech keywords)
-\newcommand{\abstractCZ}{Popis práce česky}    				 % Abstract in Czech (roughly 7 sentences, at least 80 words)
-\newcommand{\abstractEN}{Description of the project in English} % Abstract in English (translation of the Czech abstract)
+\newcommand{\keywordCZ}{LU dekompozice, Grafická karta (GPU), Compute Unified Device Architecture (CUDA), Nvidia, C++, Výkonnostní test, High Performance Computing (HPC), Porovnání výkonu, Porovnání přesnosti, Optimalizace, Template Numerical Library (TNL)}
+\newcommand{\keywordEN}{LU decomposition, Graphics Processing Unit (GPU), Compute Unified Device Architecture (CUDA), Nvidia C++, Benchmark, High Performance Computing (HPC), Performance comparison, Accuracy comparison, Optimization, Template Numerical Library (TNL)}
+\newcommand{\abstractCZ}{Tento projekt se hlavně zaměřuje na paralelizaci metody LU dekompozice na grafickch kartách (GPU). Mezi hlavni cíle této práce patří nastudování architektury a softwarové vrstvy GPU od společnosti Nvidia za účelem poskytnutí efektivního řešení rozkladu a porovnat jej s implementací na procesoru (CPU). Za tímto účelem byl implementován projekt obsahující funkcionální a výkonnostní testy. Výkonnostní testy byly spuštěny na sadě matic s různými vlastnostmi na moderním výpočetním systému. Výsledky výkonnostních testů byly analyzovány a následně byla doporučena implementace pro obecné použití.}
+\newcommand{\abstractEN}{The main focus of this project revolves around the parallelization of the LU decomposition method on the Graphics Processing Unit (GPU). Specifically, the study of the architecture and software layer of Nvidia GPUs in order to deliver an effective decomposition solution and compare it to the CPU implementation. To facilitate this, a project containing unit tests and a benchmarking framework was implemented. The benchmarks were run on a set of curated matrices with varying characteristics on a state-of-the-art compute cluster. The results of the benchmarks were analyzed and an implementation was recommended for general use.}
 
 % Declaration in Czech
 \newcommand{\declarationCZ}{Prohlašuji, že jsem svůj výzkumný úkol vypracoval samostatně a použil jsem pouze podklady (literaturu, projekty, SW atd.) uvedené v přiloženém seznamu.}
@@ -215,7 +205,7 @@
    }
 \end{center}
 
-\clearpage{\pagestyle{empty}\cleardoublepage} % prázdná stránka za tou "titulní", bez čísla
+\clearpage{\pagestyle{empty}\cleardoublepage} % Empty page after the title page - no numbering
 
 
 
@@ -227,7 +217,7 @@
 \thispagestyle{empty} % DO NOT TOUCH!
 
 % Task paper scanned as a 2-page PDF:
-\includepdf[pages={1,2}]{resources/zadani_cele.pdf} % TODO: Replace with the correct paper
+\includepdf[pages={1}]{resources/vyz-zadani-cejka.pdf}
 
 
 
@@ -340,7 +330,7 @@ V \place\ dne .................... &........................................ \\ 
 %|         The PAPER ITSELF begins here                 |
 %--------------------------------------------------------
 
-\include{preface}
+\include{introduction}
 
 \include{ch1_theory}
 \include{ch2_implementation}
