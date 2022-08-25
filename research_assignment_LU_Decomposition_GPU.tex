@@ -30,7 +30,6 @@
 \usepackage{pgfplots} 			 % For visualizations, graphics, etc.
 \pgfplotsset{compat=1.3}		 % Use pgfplots version 1.3 specifically
 
-
 % Languages:
 \usepackage{babel}
 
@@ -38,7 +37,15 @@
 \usepackage{pdfpages}			 % Add PDFs into compiled PDF
 
 % Referencing:
-\usepackage{footmisc} 			 % Refer to footnotes that already exist
+\usepackage{footmisc} 							 		  % Refer to footnotes that already exist
+\usepackage[backend=biber,								  % In TeXstudio, the backend here must correspond to: Options -> Configure TeXstudio... -> Build -> Default Bibliography Tool
+			style=iso-numeric,
+			sorting=none,
+			giveninits=true]{biblatex} 					  % Bibliography: ISO 690 format, cite shows numbers, sort according to occurence in text, shorten first names
+\addbibresource{bibliography.bib}				 		  % Specify path to bibliography file
+\DeclareFieldFormat{labelnumberwidth}{\mkbibbrackets{#1}} % Square brackets around numbers in the bibliography
+\setcounter{biburllcpenalty}{7000}						  % Insert breakpoints after lowercase letters in URLs in the bibliography
+\setcounter{biburlucpenalty}{8000}						  % Insert breakpoints after uppercase letters in URLs in the bibliography
 
 % Tables:
 \usepackage{tabularx}			 % Advanced table options
@@ -338,7 +345,7 @@ V \place\ dne .................... &........................................ \\ 
 
 \include{conclusion}
 
-\include{bibliography}
+\printbibliography
 
 \include{attachments}
 
