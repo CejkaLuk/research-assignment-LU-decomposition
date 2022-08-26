@@ -1,10 +1,10 @@
-\documentclass[12pt,a4paper,oneside,czech,american]{book} % TODO: Update 'oneside' or 'twoside' - depending on number of pages
+\documentclass[11pt,twoside,czech,american]{book}
 
 %%% Packages:
 %% Necessary packages:
 \usepackage[T1]{fontenc}		% Font encoding
 \usepackage[utf8]{inputenc}		% Input encoding
-\usepackage[a4paper, hmarginratio=3:2]{geometry}	% Use of the A4 page and setting the margins (the binding will be wider)
+\usepackage[a4paper]{geometry}	% Use of the A4 page and setting the margins (the binding will be wider)
 
 %% Other packages:
 % Code:
@@ -15,7 +15,7 @@
 \usepackage{amsmath}  			 % Advanced mathematic package
 \usepackage{xcolor}    			 % Colorful text
 \usepackage{soul}				 % Text fonts syllable by syllable - used for in-text codifying
-\usepackage{amsfonts}			 % Font package permitting the use of \mathbb{}, among other functionalities
+\usepackage[varg]{txfonts}		 % Times New Roman fonts and math alphabets, for example, provides \mathbb{}.
 
 % Graphics:
 \usepackage{graphicx} 			 % Insert raster graphic files (PNG etc.)
@@ -23,10 +23,11 @@
 \usepackage{float} 			  	 % Advanced figure placement options
 \usepackage{caption} 			 % Captions of figures, tables, etc.
 \usepackage{subcaption}			 % Sub-captions of figures, tables, etc. 
-\usepackage{tikz}				 % Visual representation of matrices, graphs etc.
-\usetikzlibrary{plotmarks, positioning}
-\usepackage{pgfplots} 			% For visualizations, graphics, etc.
-\pgfplotsset{compat=1.3}		% Use pgfplots version 1.3 specifically
+\usepackage{nicematrix, tikz}	 % Visual representation of matrices, graphs etc. - 'nicematrix' is experimental
+\usetikzlibrary{plotmarks, positioning, fit}
+\usetikzlibrary{decorations.pathreplacing, matrix, calc} % EXPERIMENTAL
+\usepackage{pgfplots} 			 % For visualizations, graphics, etc.
+\pgfplotsset{compat=1.3}		 % Use pgfplots version 1.3 specifically
 
 % Languages:
 \usepackage{babel}
@@ -34,6 +35,9 @@
 % Page formatting:
 % TODO: Replace placeholder PDF with scan of orignal task paper
 \usepackage{pdfpages}			 % Add PDFs into compiled PDF
+
+% Referencing:
+\usepackage{footmisc} 			 % Refer to footnotes that already exist
 
 % Tables:
 \usepackage{tabularx}			 % Advanced table options
@@ -45,15 +49,12 @@
 \clubpenalty=9500 	   % Completely avoid orphans (first lines of a new paragraph on the bottom of a page)
 \brokenpenalty=9500    % Prohibit page breaks after a line that has a split word at the end
 
-\topmargin=-15mm      % Upper edge slightly smaller
-\textwidth=150mm      % Text width on the page
-\textheight=240mm     % Height of the text on the page
-
+\geometry{verbose,tmargin=4cm,bmargin=3cm,lmargin=3cm,rmargin=2cm,headheight=0.8cm,headsep=1cm,footskip=0.5cm} % Setup from bachelor thesis - provides more space for the content on a page
+\raggedbottom 		   % All pages the height of the text on that page. No extra vertical space is added.
 \pagenumbering{arabic} % Page numbering in Arabic numerals
 \pagestyle{plain}      % Page numbering at the bottom center
 
-\parindent=0pt 		  % Indentation of the 1st line of the paragraph
-\parskip=7pt   		  % Spacing between paragraphs
+\parindent=0pt 		   % Indentation of the 1st line of the paragraph
 
 
 %%% Custom colors:
