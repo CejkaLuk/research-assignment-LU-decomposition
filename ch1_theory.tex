@@ -941,7 +941,7 @@ In order to show the performance difference, benchmarks for both examples using 
 
 The operation measured during the benchmark was only the multiplication of matrices
 $$ \mathbb{C} = \mathbb{A} \cdot \mathbb{B} $$
-In other words, allocation and copying of the matrices was not included in the measurement. Furthermore, the operation was looped 10 times - the measured FLOPS and run times were averaged from the 10 recorded loops. The values in Matrix $ \mathbb{A} $ were all set to $ 1 $ and to $ 0.1 $ in matrix $ \mathbb{B} $. The benchmark results in FLOPS can be found in Figure~\ref{Figure:CUDA-matrix-multiplication-benchmark-results-flops} and Table~\ref{Table:CUDA-matrix-multiplication-benchmark-results-msec} shows the results in milliseconds.
+In other words, allocation and copying of the matrices was not included in the measurement. Furthermore, the operation was looped 10 times - the measured FLOPS and run times were averaged from the 10 recorded loops. The values in Matrix $ \mathbb{A} $ were all set to 1 and to 0.1 in matrix $ \mathbb{B} $. The benchmark results in FLOPS can be found in Figure~\ref{Figure:CUDA-matrix-multiplication-benchmark-results-flops} and Table~\ref{Table:CUDA-matrix-multiplication-benchmark-results-msec} shows the results in milliseconds.
 
 \begin{figure}
 	\centering
@@ -1144,9 +1144,9 @@ It is noteworthy that since the values on the right-hand side (vector $ \textbf{
 
 In summary, from the steps above, it can argued that the \textit{decomposition algorithm} mentioned in step 2 is one of the key components of the procedure and as such it will be the main topic of this project.
 
-This method differs from similar procedures in that the resulting $ \mathbb{U} $ matrix is a unit upper triangular matrix, while $ \mathbb{L} $ remains to be a lower triangular matrix. A unit triangular matrix differs from a regular triangular matrix in that its main diagonal is comprised solely of ones. In other words, all elements on the main diagonal of $ \mathbb{U} $ are equal to $ 1 $ ($ u_{11} = u_{22} = u_{33} = 1 $):
 \subsection{Crout Method}\label{Subsection:LU-decomposition-crout-method}
 This section aims to explain in greater detail the decomposition algorithm mentioned above in step 2. There are many different procedures to decompose matrix $ \mathbb{A} $ into matrices $ \mathbb{L} $ and $ \mathbb{U} $ such that $ \mathbb{A} = \mathbb{LU} $. One such procedure, developed by Prescott Durand Croutis, is the \textit{Crout method} - sometimes also referred to as \textit{Crout matrix decomposition} or \textit{Crout factorization} \cite{Press2007}. \\
+This method differs from similar procedures in that the resulting $ \mathbb{U} $ matrix is a unit upper triangular matrix, while $ \mathbb{L} $ remains to be a lower triangular matrix. A unit triangular matrix differs from a regular triangular matrix in that its main diagonal is comprised solely of ones. In other words, all elements on the main diagonal of $ \mathbb{U} $ are equal to 1 ($ u_{11} = u_{22} = u_{33} = 1 $):
 
 \begin{equation}
 	\begin{bmatrix}
@@ -1166,7 +1166,7 @@ The Crout matrix decomposition algorithm is based on sequentially filling in mat
 	i,j &\in \widehat{n} \nonumber\,.
 \end{align}
 
-Specifically, the algorithm first computes a column $ j $ in $ \mathbb{L} $ and then row $ j $ in $ \mathbb{U} $. This process repeats itself for $ j $ from $ 1 $ to $ n $. The pseudo-code implementing the algorithm can be seen in Listing~\ref{Listing:LU-decomposition-crout-method-pseudocode} and the visualization of the algorithm's advance is shown in Figure~\ref{Figure:LU-decomposition-crout-method-visualisation}.
+Specifically, the algorithm first computes a column $ j $ in $ \mathbb{L} $ and then row $ j $ in $ \mathbb{U} $. This process repeats itself for $ j $ from 1 to $ n $. The pseudo-code implementing the algorithm can be seen in Listing~\ref{Listing:LU-decomposition-crout-method-pseudocode} and the visualization of the algorithm's advance is shown in Figure~\ref{Figure:LU-decomposition-crout-method-visualisation}.
 
 \begin{lstlisting}[caption={C++ pseudo-code implementing Crout's matrix decomposition algorithm. It assumes that \code{A[n][n]} is a two-dimensional array that represents the invertible square coefficient matrix $ \mathbb{A} $; \code{L[n][n]} and \code{U[n][n]} are also two-dimensional arrays reprenting matrices $ \mathbb{L} $ and $ \mathbb{U} $ respectively. Furthermore, it is assumed that \code{L} and \code{U} are populated with zeros. Derived from \emph{Crout's LU Factorization} \cite{rqjYYJkSwERYYbSy}, \emph{Numerical recipes: the art of scientific computing} \cite{Press2007} and \emph{Crout matrix decomposition} \cite{TgtpOw7zCHo3ii0m}.},label={Listing:LU-decomposition-crout-method-pseudocode}]
 void crout_method( A, L, U )
