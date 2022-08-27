@@ -157,7 +157,7 @@ In this project, the terms 'CUDA thread' and 'thread' will be used interchangeab
 \end{figure}
 
 \paragraph{Warp}\label{Paragraph:CUDA-thread-management-warp}
-To execute thousands of threads simultaneously, SMs of an Nvidia GPU use the Single-Instruction Multiple-Thread (SIMT) execution model. The abbreviation SIMT comes from the amalgamation of SIMD (Single-Instruction Multiple-Data) and multi-threading (executing multiple sequences of instructions simultaneously). Specifically, this approach comprises of multiple threads executing the same computations on different data items \cite{Marziale2010}. In terms of CUDA, the core of the SIMT architecture is a so-called 'warp' that is made up of 32 threads. In other words, the smallest number of threads that can be executed simultaneously is 32. If fewer threads are required, for example, only 1 thread, then CUDA will still allocate 32 threads with 31 being inactive. Similarly, if a subset of threads from a warp are to execute different instructions (e.g., as a result of a conditional statement) then the different sets of instructions are executed serially across their respective threads - this issue is known as 'thread divergence'. An example of thread divergence can be seen in Figure~\ref{Figure:CUDA-warp-thread-divergence}; the warp in the example is simplified for the purpose of the explanation and as such contains only 8 threads.
+To execute thousands of threads simultaneously, SMs of an Nvidia GPU use the Single-Instruction Multiple-Thread (SIMT) execution model. The abbreviation SIMT comes from the amalgamation of SIMD (Single-Instruction Multiple-Data) and multi-threading (executing multiple sequences of instructions simultaneously). Specifically, this approach comprises of multiple threads executing the same computations on different data items \cite{Marziale2010}. In terms of CUDA, the core of the SIMT architecture is a so-called 'warp' that is made up of 32 threads. In other words, the smallest number of threads that can be executed simultaneously is 32. If fewer threads are required, for example, only one thread, then CUDA will still allocate 32 threads with 31 being inactive. Similarly, if a subset of threads from a warp are to execute different instructions (e.g., as a result of a conditional statement) then the different sets of instructions are executed serially across their respective threads - this issue is known as 'thread divergence'. An example of thread divergence can be seen in Figure~\ref{Figure:CUDA-warp-thread-divergence}; the warp in the example is simplified for the purpose of the explanation and as such contains only 8 threads.
 
 \begin{figure}[h!]
 	\centering
@@ -239,14 +239,14 @@ Shared memory of each block is divided into 32-bit (4-byte) memory modules calle
 		\subcaption{Shared memory divided into banks (column under each \code{Bank*}) and words (individual rectangles with IDs inside).}
 		\label{Figure:CUDA-shared-memory-banks-words-ids}
 	\end{subfigure}
-	\caption{Illustration of shared memory. In this example, there are 32 banks; each one has eight 4-byte (32-bit) words - in Figure~\ref{Figure:CUDA-shared-memory-banks-words-bytes} 1 byte is 1 square. Reading and writing into the \code{0th}, \code{32nd}, \code{64th}, etc. word is the responsibility of \code{Bank0}; reading and writing into the \code{1st}, \code{33rd}, \code{65th}, etc. word is the responsibility of \code{Bank1} and so on. Taken from \emph{Chapter 6: Shared Memory} of \emph{Cuda Succinctly} \cite{Rose2017}.}
+	\caption{Illustration of shared memory. In this example, there are 32 banks; each one has eight 4-byte (32-bit) words - in Figure~\ref{Figure:CUDA-shared-memory-banks-words-bytes} one byte is one square. Reading and writing into the \code{0th}, \code{32nd}, \code{64th}, etc. word is the responsibility of \code{Bank0}; reading and writing into the \code{1st}, \code{33rd}, \code{65th}, etc. word is the responsibility of \code{Bank1} and so on. Taken from \emph{Chapter 6: Shared Memory} of \emph{Cuda Succinctly} \cite{Rose2017}.}
 	\label{Figure:CUDA-shared-memory-banks-words}
 \end{figure}
 
 Manipulating memory in banks can be fast and efficient under certain conditions. Let us consider the following example: Figure~\ref{Figure:CUDA-shared-memory-banks-words-ids} is the shared memory of a block that is used in a kernel. In this kernel, there is an array made up of 256 floats (32-bit) - each word in the figure is a single float. Furthermore, the IDs of words in the figure correspond to indices of floats in the array, thus, float values stored next to each other in memory belong to successive banks, for example, \code{arr[0]} belongs to \code{Bank0}, \code{arr[1]} belongs to \code{Bank1}, \code{arr[32]} belongs to \code{Bank0}, etc. \\
-As mentioned by Chris Rose in \emph{CUDA Succinctly} \cite{Rose2017}, this division of words into banks is salient as each bank can serve only 1 word to a warp at once. This means that if a single word is requested from each bank, then all 32 threads of a warp can be served by all 32 banks simultaneously and expeditiously. Data serving is also fast when the same word from shared memory is accessed by all threads of a warp; this is called a \textit{broadcast} as shared memory is read once and the value is sent to all threads of the warp at once. \\
-A concept similar to broadcasting is called a \textit{multicast}, which is an operation that is used when the same word from any particular bank is accessed by more than 1 thread of a warp. In this case, the threads that accessed the word will all receive it simultaneously from its bank. Under good conditions, the multicast operation is as fast as a broadcast. It is important to note that multicast is only available for compute capability 2.0 and higher. \\
-However, the operations above all assumed good conditions for reading and writing of data. The primary originator of bad conditions for accessing shared memory is called a \textit{bank conflict}. Bank conflict describes an instance when threads of a warp request more than 1 word from any single bank. When this occurs, reading and writing of a word will be performed serially by the bank. For example - looking at Figure ~\ref{Figure:CUDA-shared-memory-banks-words-ids} - let thread \code{0} and thread \code{1} access words \code{0} and \code{32} respectively. Since both words belong to \code{Bank0}, then a bank conflict has occurred and the bank cannot distribute words' data in parallel. Instead, \code{Bank0} will firstly serve thread \code{0} with word \code{0} and then thread \code{1} with word \code{32}. \\
+As mentioned by Chris Rose in \emph{CUDA Succinctly} \cite{Rose2017}, this division of words into banks is salient as each bank can serve only one word to a warp at once. This means that if a single word is requested from each bank, then all 32 threads of a warp can be served by all 32 banks simultaneously and expeditiously. Data serving is also fast when the same word from shared memory is accessed by all threads of a warp; this is called a \textit{broadcast} as shared memory is read once and the value is sent to all threads of the warp at once. \\
+A concept similar to broadcasting is called a \textit{multicast}, which is an operation that is used when the same word from any particular bank is accessed by more than one thread of a warp. In this case, the threads that accessed the word will all receive it simultaneously from its bank. Under good conditions, the multicast operation is as fast as a broadcast. It is important to note that multicast is only available for compute capability 2.0 and higher. \\
+However, the operations above all assumed good conditions for reading and writing of data. The primary originator of bad conditions for accessing shared memory is called a \textit{bank conflict}. Bank conflict describes an instance when threads of a warp request more than one word from any single bank. When this occurs, reading and writing of a word will be performed serially by the bank. For example - looking at Figure ~\ref{Figure:CUDA-shared-memory-banks-words-ids} - let thread \code{0} and thread \code{1} access words \code{0} and \code{32} respectively. Since both words belong to \code{Bank0}, then a bank conflict has occurred and the bank cannot distribute words' data in parallel. Instead, \code{Bank0} will firstly serve thread \code{0} with word \code{0} and then thread \code{1} with word \code{32}. \\
 In order to facilitate further understanding, examples from \emph{Cuda succinctly} \cite{Rose2017} and \emph{CUDA C++ Programming Guide} \cite{NVIDIAMay2022} are included below. \\
 Firstly, Table~\ref{Table:CUDA-shared-memory-access-patterns} presents different shared memory access patterns - including notes on the speed of execution. Then, Figure~\ref{Figure:CUDA-shared-memory-banks-words-no-conflicts} portrays shared memory access using random permutations, multicast and broadcast. Finally, Figure~\ref{Figure:CUDA-shared-memory-banks-words-conflicts} shows examples of strided shared memory access with and without bank conflict - additionally, this figure also visualizes some examples from Table~\ref{Table:CUDA-shared-memory-access-patterns}.
 
@@ -263,9 +263,9 @@ Firstly, Table~\ref{Table:CUDA-shared-memory-access-patterns} presents different
 		\hline
 		\code{arr[tID]} 		& Fast - all threads request from different banks \\
 		\hline
-		\code{arr[tID/2]} 		& Fast - multicast; every 2 threads read from the same bank \\
+		\code{arr[tID/2]} 		& Fast - multicast; every two threads read from the same bank \\
 		\hline
-		\code{arr[tID*2]} 		& Slow - 2-way bank conflict \\
+		\code{arr[tID*2]} 		& Slow - two-way bank conflict \\
 		\hline
 		\code{arr[tID*3]} 		& Fast - all threads access different banks \\
 		\hline
@@ -279,14 +279,14 @@ Firstly, Table~\ref{Table:CUDA-shared-memory-access-patterns} presents different
 \begin{figure}[h!]
 	\centering
 	\includegraphics[width=11cm, keepaspectratio]{images/ch1/CUDA_shared_memory_banks_words_no_conflicts.png}
-	\caption{Irregular shared memory accesses on 3 separate examples; yellow rectangular cuboids are banks; small orange rectangles are words. The left sub-image shows threads of a warp accessing shared memory randomly, however, in such a way that does not cause bank conflicts. The middle sub-image shows shared memory accessed by threads using the multicast operation, specifically, threads 3, 4, 5, 6, 7 and 9 accessing the same word from bank 5; other threads all access one word any bank each - no bank conflict. The right sub-image shows threads accessing shared memory via 2 broadcast operations. Taken from Nvidia's \emph{CUDA C++ Programming Guide} \cite{NVIDIAMay2022}.}
+	\caption{Irregular shared memory accesses on 3 separate examples; yellow rectangular cuboids are banks; small orange rectangles are words. The left sub-image shows threads of a warp accessing shared memory randomly, however, in such a way that does not cause bank conflicts. The middle sub-image shows shared memory accessed by threads using the multicast operation, specifically, threads 3, 4, 5, 6, 7 and 9 accessing the same word from bank 5; other threads all access one word any bank each - no bank conflict. The right sub-image shows threads accessing shared memory via two broadcast operations. Taken from Nvidia's \emph{CUDA C++ Programming Guide} \cite{NVIDIAMay2022}.}
 	\label{Figure:CUDA-shared-memory-banks-words-no-conflicts}
 \end{figure}
 
 \begin{figure}[h!]
 	\centering
 	\includegraphics[width=11cm, keepaspectratio]{images/ch1/CUDA_shared_memory_banks_words_conflicts.png}
-	\caption{Shared memory access using striding on 3 separate examples; yellow rectangular cuboids are banks; small orange rectangles are words. The left sub-image shows threads of a warp accessing shared memory with a stride of 1 (no bank conflict). The middle sub-image shows shared memory accessed by threads with a stride of 2 (equivalent to \code{arr[tID*2]} from Table~\ref{Table:CUDA-shared-memory-access-patterns}; 2-way bank conflict as threads access 2 different words from the same bank). The right sub-image shows threads accessing shared memory with a stride of 3 (equivalent to \code{arr[tID*3]} from Table~\ref{Table:CUDA-shared-memory-access-patterns}; no bank conflict). Taken from Nvidia's \emph{CUDA C++ Programming Guide} \cite{NVIDIAMay2022}.}
+	\caption{Shared memory access using striding on 3 separate examples; yellow rectangular cuboids are banks; small orange rectangles are words. The left sub-image shows threads of a warp accessing shared memory with a stride of 1 (no bank conflict). The middle sub-image shows shared memory accessed by threads with a stride of 2 (equivalent to \code{arr[tID*2]} from Table~\ref{Table:CUDA-shared-memory-access-patterns}; two-way bank conflict as threads access two different words from the same bank). The right sub-image shows threads accessing shared memory with a stride of 3 (equivalent to \code{arr[tID*3]} from Table~\ref{Table:CUDA-shared-memory-access-patterns}; no bank conflict). Taken from Nvidia's \emph{CUDA C++ Programming Guide} \cite{NVIDIAMay2022}.}
 	\label{Figure:CUDA-shared-memory-banks-words-conflicts}
 \end{figure}
 
@@ -313,7 +313,7 @@ More specifically, a single coalesced access into global memory - composed of a 
 	\item Each segment must be aligned to its size - first address is a multiple of their size
 \end{enumerate}
 
-The alignment requirement signifies that accessing (reading and writing) words of size 1, 2, 4, 8, or 16 bytes within global memory instructions is supported. Moreover, if the size of data stored in global memory is 1, 2, 4, 8, or 16 bytes and it is aligned, then access to this data is joined into 1 memory transaction. \\
+The alignment requirement signifies that accessing (reading and writing) words of size 1, 2, 4, 8, or 16 bytes within global memory instructions is supported. Moreover, if the size of data stored in global memory is 1, 2, 4, 8, or 16 bytes and it is aligned, then access to this data is joined into one memory transaction. \\
 Ad point 2 of the conditions above: when threads of a warp access words larger than 4 bytes, then the memory request made by the warp is divided into separate 128-byte memory requests. These newly-formed requests are subsequently performed separately, based on the word size \cite{NVIDIAMay2022}:
 
 \begin{itemize}
@@ -336,7 +336,7 @@ Table~\ref{Table:CUDA-built-in-aligned-vector-types} shows examples of built-in 
 		double1, double2, double3, double4 & 8, 16, 8, 16 \\
 		\hline
 	\end{tabular}
-	\caption{Built-in vector types that are aligned by default. The suffix numbers specify the number of components the vector composes of, for example, a vector of type \code{int2} has 2 components: \code{(x, y)}. Taken from Nvidia's \emph{CUDA C++ Programming Guide} \cite{NVIDIAMay2022}.}
+	\caption{Built-in vector types that are aligned by default. The suffix numbers specify the number of components the vector composes of, for example, a vector of type \code{int2} has two components: \code{(x, y)}. Taken from Nvidia's \emph{CUDA C++ Programming Guide} \cite{NVIDIAMay2022}.}
 	\label{Table:CUDA-built-in-aligned-vector-types}
 \end{table}
 
@@ -362,7 +362,7 @@ Examples of coalesced and non-coalesced memory accesses by a 16-thread warp are 
 \begin{figure}[h!]
 	\centering
 	\includegraphics[width=0.7\textwidth, keepaspectratio]{images/ch1/CUDA_global_memory_coalesced_access.png}
-	\caption{Coalesced access to global memory. Threads are denoted with \code{t<ID>} and the numbers below the rectangular memory locations are global memory addresses. In the upper image, all threads of the warp access successive memory addresses which house words of size 4 bytes (\code{float}), the size of the memory transaction is 64 bytes, and the segment is aligned to its size so that the first address is a multiple of its size: segment is 64 bytes and the starting address is 128: $ 128/64 = 2 $. The lower image shows an example where 2 threads from the 16-thread warp do not access data. Thus, threads of the warp have 2 separate execution paths (thread/warp divergence) that are executed sequentially. However, from a memory standpoint, the access is still coalesced as all requirements are fulfilled. Taken from Martínez Manuel Ujaldón's \emph{CUDA Optimizations, Debugging and Profiling} \cite{xUOrKLpxlGjvTonr}.}
+	\caption{Coalesced access to global memory. Threads are denoted with \code{t<ID>} and the numbers below the rectangular memory locations are global memory addresses. In the upper image, all threads of the warp access successive memory addresses which house words of size 4 bytes (\code{float}), the size of the memory transaction is 64 bytes, and the segment is aligned to its size so that the first address is a multiple of its size: segment is 64 bytes and the starting address is 128: $ 128/64 = 2 $. The lower image shows an example where two threads from the 16-thread warp do not access data. Thus, threads of the warp have two separate execution paths (thread/warp divergence) that are executed sequentially. However, from a memory standpoint, the access is still coalesced as all requirements are fulfilled. Taken from Martínez Manuel Ujaldón's \emph{CUDA Optimizations, Debugging and Profiling} \cite{xUOrKLpxlGjvTonr}.}
 	\label{Figure:CUDA-global-memory-coalesced-access}
 \end{figure}
 
@@ -371,7 +371,7 @@ Examples of coalesced and non-coalesced memory accesses by a 16-thread warp are 
 	\begin{subfigure}{\textwidth}
 		\centering
 		\includegraphics[width=0.7\textwidth, keepaspectratio]{images/ch1/CUDA_global_memory_non-coalesced_access.png}
-		\subcaption{In the upper image, 2 threads swap orders and thus do not access successive floats in global memory. However, according to \emph{CUDA C++ Programming Guide} \cite{NVIDIAMay2022} this does not result in non-coalesced memory access. All other requirements are fulfilled. The lower image shows a scenario where the starting address is misaligned as the size of the memory segment is 64 bytes, but, the starting address is 132 which is not divisible by 64: $ 132/64 = 2.0625 $. Therefore, access is misaligned and the memory segment is read in 2 sequential memory transactions: starting addresses 128 - 188 and starting addresses 192-252.}
+		\subcaption{In the upper image, two threads swap orders and thus do not access successive floats in global memory. However, according to \emph{CUDA C++ Programming Guide} \cite{NVIDIAMay2022} this does not result in non-coalesced memory access. All other requirements are fulfilled. The lower image shows a scenario where the starting address is misaligned as the size of the memory segment is 64 bytes, but, the starting address is 132 which is not divisible by 64: $ 132/64 = 2.0625 $. Therefore, access is misaligned and the memory segment is read in two sequential memory transactions: starting addresses 128 - 188 and starting addresses 192-252.}
 		\label{Sub-figure:CUDA-global-memory-non-coalesced-access}
 	\end{subfigure}
 	
@@ -379,10 +379,10 @@ Examples of coalesced and non-coalesced memory accesses by a 16-thread warp are 
 		\centering
 		\hspace*{-0.8cm}
 		\includegraphics[width=0.7\textwidth, keepaspectratio]{images/ch1/CUDA_global_memory_non-coalesced_access-2.png}
-		\subcaption{In the upper image, threads \code{t2} - \code{t15} are misaligned with the original starting address. Thus, similarly to the lower image in Figure~\ref{Sub-figure:CUDA-global-memory-non-coalesced-access} the memory transaction will be split into 2 sequential transactions. The lower image shows a situation where global memory houses 12-byte \code{struct} types. However, as Table~\ref{Table:CUDA-built-in-aligned-vector-types} and Listing~\ref{Listing:CUDA-aligned-structure-declaration} show, 12-byte alignment is not supported and therefore global memory access is non-coalesced.}
+		\subcaption{In the upper image, threads \code{t2} - \code{t15} are misaligned with the original starting address. Thus, similarly to the lower image in Figure~\ref{Sub-figure:CUDA-global-memory-non-coalesced-access} the memory transaction will be split into two sequential transactions. The lower image shows a situation where global memory houses 12-byte \code{struct} types. However, as Table~\ref{Table:CUDA-built-in-aligned-vector-types} and Listing~\ref{Listing:CUDA-aligned-structure-declaration} show, 12-byte alignment is not supported and therefore global memory access is non-coalesced.}
 		\label{Sub-figure:CUDA-global-memory-non-coalesced-access-2}
 	\end{subfigure}
-	\caption{Examples of coalesced and non-coalesced access to global memory composed of 4-byte words (for example, \code{float}) with 1 exception being 12-byte structures. Taken from Martínez Manuel Ujaldón's \emph{CUDA Optimizations, Debugging and Profiling} \cite{xUOrKLpxlGjvTonr}.}
+	\caption{Examples of coalesced and non-coalesced access to global memory composed of 4-byte words (for example, \code{float}) with one exception being 12-byte structures. Taken from Martínez Manuel Ujaldón's \emph{CUDA Optimizations, Debugging and Profiling} \cite{xUOrKLpxlGjvTonr}.}
 	\label{Figure:CUDA-global-memory-non-coalesced-access-examples}
 \end{figure}
 
@@ -464,8 +464,8 @@ Since each kernel is launched on an individual grid of blocks of threads, then t
 \end{table}
 
 The second limitation - CUDA context - signifies that if there are two CUDA applications running at the same time on a system, then two kernels - one from each context - will not be run in concurrently. Instead, the kernel that was launched second will be queued to execute until the first kernel has finished. \\
-The last limitation - device resources - is not as severe the previous 2 since kernels can still be launched concurrently, even if their cumulative required resources exceed the device's available resources. This is due to the fact that if more than 1 kernel is set to be launched concurrently, they are only run simultaneously if the available resources are sufficient for them all. If the resources available are not sufficient, then the kernels which would not get their requested resources are put aside until the resources are free. In this instance, resources represent memory and threads. \\
-In terms of memory, an example of kernels that will often not run concurrently with other kernels are ones that require large amounts of local memory \cite{NVIDIAMay2022}. In terms of threads, the limiting factor is the maximum number of active threads - described at the end of the \textit{\nameref{Paragraph:CUDA-thread-management-grid}} paragraph in Section~\ref{Paragraph:CUDA-thread-management-grid}. For example, if 2 kernels are to be run concurrently, the total number of threads required by them at once must not exceed the maximum number of active threads on the device. \\
+The last limitation - device resources - is not as severe the previous two since kernels can still be launched concurrently, even if their cumulative required resources exceed the device's available resources. This is due to the fact that if more than one kernel is set to be launched concurrently, they are only run simultaneously if the available resources are sufficient for them all. If the resources available are not sufficient, then the kernels which would not get their requested resources are put aside until the resources are free. In this instance, resources represent memory and threads. \\
+In terms of memory, an example of kernels that will often not run concurrently with other kernels are ones that require large amounts of local memory \cite{NVIDIAMay2022}. In terms of threads, the limiting factor is the maximum number of active threads - described at the end of the \textit{\nameref{Paragraph:CUDA-thread-management-grid}} paragraph in Section~\ref{Paragraph:CUDA-thread-management-grid}. For example, if two kernels are to be run concurrently, the total number of threads required by them at once must not exceed the maximum number of active threads on the device. \\
 Therefore, whether kernels can be run concurrently is highly dependent on the resource requirements of each kernel and it is up to the device to manage all of these operations.
 
 \subsubsection{Streams}\label{Subsubsection:CUDA-asynchronous-concurrent-execution-concurrent-streams}
@@ -491,7 +491,7 @@ for( int i = 0; i < 2; ++i ) {
 
 In order to make a kernel run on a specific stream, the stream address must be specified as one of the launch parameters of the kernel - detailed in Section~\ref{Subsection:CUDA-C++-extensions}. Launching a kernel on a specific stream is shown in Listing~\ref{Listing:run-kernels-on-streams}.
 
-\begin{lstlisting}[caption={Pseudo-code for launching 2 different kernels using 2 different streams. The instructions in this example would be executed from the host. Since each kernel is essentially an open door to the device for instructions, then, once \code{MyKernelA} is launched on \code{stream[0]}, the control is returned to the host without waiting for \code{MyKernelA} to finish. Subsequently, the host will immediately launch \code{MyKernelB} using \code{stream[1]}. In this example, each kernel is launched on a grid made up of 1 single-thread block with 0 bytes of dynamic shared memory allocated, thus, the devic resources will not be exhausted and both kernels will run concurrently. Taken from Nvidia's \emph{CUDA C++ Programming Guide} \cite{NVIDIAMay2022}.},label={Listing:run-kernels-on-streams}]
+\begin{lstlisting}[caption={Pseudo-code for launching two different kernels using two different streams. The instructions in this example would be executed from the host. Since each kernel is essentially an open door to the device for instructions, then, once \code{MyKernelA} is launched on \code{stream[0]}, the control is returned to the host without waiting for \code{MyKernelA} to finish. Subsequently, the host will immediately launch \code{MyKernelB} using \code{stream[1]}. In this example, each kernel is launched on a grid made up of one single-thread block with 0 bytes of dynamic shared memory allocated, thus, the devic resources will not be exhausted and both kernels will run concurrently. Taken from Nvidia's \emph{CUDA C++ Programming Guide} \cite{NVIDIAMay2022}.},label={Listing:run-kernels-on-streams}]
 // Launch MyKernelA using the 0th stream using 1 block made up of 1 thread and 0 bytes of dynamically allocated shared memory
 MyKernelA<<< 1, 1, 0, stream[0] >>>( inputVariableA )
 
@@ -524,13 +524,13 @@ The first, and arguably the most used, type of synchronization when it comes to 
 Additionally, CUDA provides a function to check whether all commands of a stream that precede the current line of code have finished: \code{cudaStreamQuery()}. Further functions that can be used to manage streams can be found in section \emph{6.4 Stream Management} in the \emph{CUDA Runtime API} \cite{NvidiaJanuary2022}.
 
 \paragraph{Implicit synchronization}\label{Paragraph:CUDA-asynchronous-concurrent-execution-streams-implicit-synchronization}
-The opposing type of synchronization is called implicit, and, as mentioned in paragraph \textit{Default stream} above, it is used by default under certain conditions - unless explicitly overridden by one of the functions above. Specifically, Nvidia states in \emph{CUDA C++ Programming Guide} \cite{NVIDIAMay2022} that if there are 2 streams, then 2 commands - each from 1 stream - cannot be run simultaneously if the host thread issues any of the following operations:
+The opposing type of synchronization is called implicit, and, as mentioned in paragraph \textit{\nameref{Paragraph:CUDA-asynchronous-concurrent-execution-streams-default-stream}} above, it is used by default under certain conditions - unless explicitly overridden by one of the functions above. Specifically, Nvidia states in \emph{CUDA C++ Programming Guide} \cite{NVIDIAMay2022} that if there are two streams, then two commands - each from one stream - cannot be run simultaneously if the host thread issues any of the following operations:
 
 \begin{itemize}
 	\item Page-locked host memory allocation
 	\item Device memory allocation
 	\item Device memory set
-	\item Memory copy between 2 addresses to the same device memory
+	\item Memory copy between two addresses to the same device memory
 	\item Any CUDA command to the NULL stream
 	\item Switch between the shared memory configurations
 \end{itemize}
@@ -548,7 +548,7 @@ Thus, in order to improve application performance, Nvidia recommends developers 
 
 \subsection{C++ CUDA Extensions}\label{Subsection:CUDA-C++-extensions}
 As previously mentioned at the beginning of Section~\ref{Section:CUDA}, CUDA supports a variety of programming languages. Among them is C++, a widely-used, high-performance C-based language that implicitly allows low-level memory manipulation. CUDA provides many different extensions to C++, however, for the purpose of this project only the core basics that were used during its development along with some other important extensions will be detailed. \\
-This section will divided into 2 main categories: outer-kernel and inner-kernel extensions. The former is made up of memory-related operations (allocating, copying and freeing data), kernel launch configurations, function extensions, streams, etc. - i.e. extensions not used within kernels. The latter consists of any operators, structures and declarations that are used in kernels.
+This section will divided into two main categories: outer-kernel and inner-kernel extensions. The former is made up of memory-related operations (allocating, copying and freeing data), kernel launch configurations, function extensions, streams, etc. - i.e. extensions not used within kernels. The latter consists of any operators, structures and declarations that are used in kernels.
 
 \subsubsection{Outer-kernel Extensions}\label{Subsubsection:CUDA-C++-extensions-outer-kernel-extensions}
 This category will first present a selection of important memory managing extensions along with those that were used during the development of this project. Then, kernel-specific extensions will be detailed. Finally, the last part will present function modifiers that state where a function can be executed. The extensions to C++ for streams were described above in the \textit{\nameref{Subsubsection:CUDA-asynchronous-concurrent-execution-concurrent-streams}} part of Section~\ref{Subsubsection:CUDA-asynchronous-concurrent-execution-concurrent-streams}.
@@ -669,9 +669,9 @@ Once a kernel is a launched on the device, it can be run concurrently on thousan
 
 The variables above can be combined to calculate the global ID of a thread, i.e. the thread's ID within a grid:
 $$\code{globalID = blockIdx.x * blockDimx.x + threadIdx.x}$$
-The \code{globalID} is useful when working with matrices, for example, adding 2 matrices. In such an example, each thread would take 2 elements (1 from each matrix), add them and then store the result into a new matrix - as shown in Listing~\ref{Listing:CUDA-matrix-addition-example}.
+The \code{globalID} is useful when working with matrices, for example, adding two matrices. In such an example, each thread would take two elements (1 from each matrix), add them and then store the result into a new matrix - as shown in Listing~\ref{Listing:CUDA-matrix-addition-example}.
 
-\begin{lstlisting}[caption={Example of C++ pseudocode of a kernel that adds 2 matrices using 2-dimensional thread blocks. Since each thread has a unique \code{globalID} for each of 2 dimensions, then those IDs can be used as indices for adding matrix elements. This simple example does not take into account allocation and copying data from host to device. Taken from Nvidia's \emph{CUDA C++ Programming Guide} \cite{NVIDIAMay2022}.},label={Listing:CUDA-matrix-addition-example}]
+\begin{lstlisting}[caption={Example of C++ pseudocode of a kernel that adds two matrices using 2-dimensional thread blocks. Since each thread has a unique \code{globalID} for each of two dimensions, then those IDs can be used as indices for adding matrix elements. This simple example does not take into account allocation and copying data from host to device. Taken from Nvidia's \emph{CUDA C++ Programming Guide} \cite{NVIDIAMay2022}.},label={Listing:CUDA-matrix-addition-example}]
 // Kernel definition
 __global__ void MatAdd( float A[N][N], float B[N][N], float C[N][N] )
 {
@@ -717,7 +717,7 @@ In paragraph \textit{\nameref{Paragraph:CUDA-memory-management-shared-memory}} i
 
 
 \subsection{Matrix Multiplication}\label{Subsection:matrix-multiplication}
-In order to consolidate how CUDA can be used to accelerate the execution of a simple task, such as matrix multiplication, this section will present solutions to this task from Nvidia's \emph{CUDA C++ Programming Guide} \cite{NVIDIAMay2022}. Furthermore, for the purpose of showcasing and stressing the importance of abiding by Nvidia's recommendations when it comes to best practices and optimal performance, 2 examples will be presented. The first example will only use global memory to read the input matrix and write the resulting matrix, i.e. without shared memory. On the other hand, the second example will use shared memory to minimize accessing global memory. \\
+In order to consolidate how CUDA can be used to accelerate the execution of a simple task, such as matrix multiplication, this section will present solutions to this task from Nvidia's \emph{CUDA C++ Programming Guide} \cite{NVIDIAMay2022}. Furthermore, for the purpose of showcasing and stressing the importance of abiding by Nvidia's recommendations when it comes to best practices and optimal performance, two examples will be presented. The first example will only use global memory to read the input matrix and write the resulting matrix, i.e. without shared memory. On the other hand, the second example will use shared memory to minimize accessing global memory. \\
 It is important to note that neither example is fully functional as the logic of some functions has been omitted due to unnecessary complexity and irrelevance to showcasing the capabilities of CUDA. In other words, the code shown will not compile, nor will it run - the full code can be found in Nvidia's \emph{CUDA C++ Programming Guide} \cite{NVIDIAMay2022}. The full working example (\code{matrixMul.cu}) encompassed by the build automation tool \code{make} can be unpacked during the installation of a CUDA toolkit. \\
 Before introducing the specifics of each example, their similarities will be presented. \\
 First, the task that will be performed is matrix multiplication:
@@ -726,7 +726,7 @@ First, the task that will be performed is matrix multiplication:
 	\mathbb{C} = \mathbb{A} \cdot \mathbb{B}
 \end{equation}
 
-In the context of this operation all matrix dimensions are assumed such that it is a legal operation. Additionally, for simplicity, the dimensions of the matrices are assumed to be multiples of the thread block size. This limitation can be avoided by allocating an extra row and column of blocks in the grid and setting a boundary condition in the kernel - each of the 2 examples (global vs shared memory) require slightly different approaches which will be described later. \\
+In the context of this operation all matrix dimensions are assumed such that it is a legal operation. Additionally, for simplicity, the dimensions of the matrices are assumed to be multiples of the thread block size. This limitation can be avoided by allocating an extra row and column of blocks in the grid and setting a boundary condition in the kernel - each of the two examples (global vs shared memory) require slightly different approaches which will be described later. \\
 Let each matrix be represented by a structure \code{Matrix}:
 
 \begin{lstlisting}[caption={Definition of the structure that will represent a matrix. The \code{width} variable stores the number of columns and \code{height} stores the number of rows the matrix has. The elements of the matrix are stored in row-major order in the single-precision (float) array: \code{values}. Taken from Nvidia's \emph{CUDA C++ Programming Guide} \cite{NVIDIAMay2022}.},label={Listing:CUDA-matrix-multiplication-matrix-structure-definition}]
@@ -799,7 +799,7 @@ The \code{Matrix} structure and \code{MatMul} function conclude the equivalent p
 
 \subsubsection{Example without Shared Memory}
 The first example uses only global memory access, i.e. without shared memory. This means that the kernel - invoked on line 31 in Listing~\ref{Listing:CUDA-matrix-multiplication-host-mat-mul-function} - receives the \code{Matrix} structures stored in global memory and each thread reads from and writes to the same global memory whenever they need to. \\
-The kernel is launched on a grid of thread such that each thread is responsible for calculating exactly 1 element of the resulting \code{C} matrix. For example, let there be a thread with indices \code{row\_id} and \code{col\_id}. This thread will perform element-wise multiplication of row \code{row\_id} from matrix \code{A} and column \code{col\_id} from matrix \code{B}. Then, it will store the sum of these elements as the resulting value \code{C(row\_id, col\_id)} into matrix \code{C}. \\
+The kernel is launched on a grid of thread such that each thread is responsible for calculating exactly one element of the resulting \code{C} matrix. For example, let there be a thread with indices \code{row\_id} and \code{col\_id}. This thread will perform element-wise multiplication of row \code{row\_id} from matrix \code{A} and column \code{col\_id} from matrix \code{B}. Then, it will store the sum of these elements as the resulting value \code{C(row\_id, col\_id)} into matrix \code{C}. \\
 The visualization of this approach is shown in Figure~\ref{Figure:CUDA-matrix-multiplication-without-shared-memory-example} and the kernel is presented in Listing~\ref{Listing:CUDA-matrix-multiplication-without-shared-memory-example}.
 
 \begin{figure}[h!]
@@ -1140,7 +1140,7 @@ Then, substituting Equation~\ref{Equation:LU-decomposition-system-linear-equatio
 	\end{equation}
 \end{enumerate}
 
-It is noteworthy that since the values on the right-hand side (vector $ \textbf{b} $) are only required in step 3 (equations~\ref{Equation:LU-decomposition-solving-Lyb} and \ref{Equation:LU-decomposition-solving-Uxy}), they are not required for the process of decomposition itself. Thus, if there is more than 1 right side in the system of linear equations, matrix $ \mathbb{A} $ needs to be decomposed into matrices $ \mathbb{L} $ and $ \mathbb{U} $ only once; the same principle is valid even if the right side is not known ahead of time. In other words, $ \mathbb{L} $ and $ \mathbb{U} $ can used to solve the system for different right-hand sides without the need for repeated decomposition. Additionally, this concept can be seen as an advantage for LU decomposition compared to Gaussian elimination as the latter requires the right-hand side to obtain the system's upper triangular matrix and subsequently use it for backward substitution. This concept is described, for example, by George Lindfield and John Penny in \emph{Numerical Methods: Linear Equations and Eigensystems} \cite{Lindfield2019}.
+It is noteworthy that since the values on the right-hand side (vector $ \textbf{b} $) are only required in step 3 (equations~\ref{Equation:LU-decomposition-solving-Lyb} and \ref{Equation:LU-decomposition-solving-Uxy}), they are not required for the process of decomposition itself. Thus, if there is more than one right side in the system of linear equations, matrix $ \mathbb{A} $ needs to be decomposed into matrices $ \mathbb{L} $ and $ \mathbb{U} $ only once; the same principle is valid even if the right side is not known ahead of time. In other words, $ \mathbb{L} $ and $ \mathbb{U} $ can used to solve the system for different right-hand sides without the need for repeated decomposition. Additionally, this concept can be seen as an advantage for LU decomposition compared to Gaussian elimination as the latter requires the right-hand side to obtain the system's upper triangular matrix and subsequently use it for backward substitution. This concept is described, for example, by George Lindfield and John Penny in \emph{Numerical Methods: Linear Equations and Eigensystems} \cite{Lindfield2019}.
 
 In summary, from the steps above, it can argued that the \textit{decomposition algorithm} mentioned in step 2 is one of the key components of the procedure and as such it will be the main topic of this project.
 
@@ -1218,7 +1218,7 @@ void crout_method( A, L, U )
 \end{figure}
 
 \subsection{Numerical Method}\label{Subsection:LU-decomposition-numerical-method}
-When solving systems of linear equations there are 2 main groups of methods:
+When solving systems of linear equations there are two main groups of methods:
 
 \begin{enumerate}
 	\item Direct methods - theoretically, the exact solution will be obtained after a finite amount of steps (e.g. Crout method).
