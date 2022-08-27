@@ -6,7 +6,7 @@ The Template Numerical Library (TNL) is a collaborative, open-source project lic
 While TNL contains, among others, many different data structures. For the purpose of this project only the one used during development will be introduced.
 
 \paragraph{Dense matrix}\label{Paragraph:implementation-tnl-library-dense-matrix}
-As mentioned at the end of Section~\ref{Subsection:theory-LU-decomposition-numerical-method}, the goal of this project is to combine the parallel nature of CUDA-enabled Nvidia GPUs and the heavily parallelizable algorithm described in the same section (labeled as \textit{Iterative Crout method} for the purpose of this project). \\
+As mentioned at the end of Section~\ref{Subsection:theory-LU-decomposition-numerical-method}, the goal of this project is to combine the parallel nature of CUDA-enabled Nvidia GPUs and the heavily parallelizable algorithm described in the same section (\textit{Iterative Crout method}). \\
 Therefore, in order to store all matrices involved in the computation, an efficient, robust and intuitive data structure was required. While in terms of matrices TNL mainly revolves around sparse implementations (i.e. efficiently storing and performing operations with matrices that have more zero than nonzero elements), it also possesses the opposite: \textit{dense matrices}. As the name suggest, dense matrices are matrix structures densely populated with elements. In other words, a dense matrix stores every single element, regardless of its value (zeros and nonzeros are stored). In TNL, the class representing the dense matrix data structure is called \code{DenseMatrix} and it is located in the \code{TNL::Matrices} namespace. Similarly to the majority of classes representing matrices in TNL, it inherits from the \code{Matrix} class; the visualization of inheritance can be found in Figure~\ref{Figure:implementation-tnl-library-dense-matrix}.
 
 \begin{figure}[ht!]
@@ -110,7 +110,7 @@ As mentioned before, GoogleTest\footref{Footnote:google-test} was chosen as the 
 	\item GoogleTest fully supports C++ and is still actively being developed (roughly at least one merged pull request a week as of July 2022).
 \end{itemize}
 
-As the testing infrastructure was mostly adopted from TNL (detailed in Section 3.1 of the author's bachelor thesis \textit{Formats for storage of sparse matrices on GPU} \cite{Cejka2020}) it will only be described briefly.
+As the testing infrastructure was mostly adopted from TNL (detailed in Section 3.1 of the author's bachelor thesis \emph{Formats for storage of sparse matrices on GPU} \cite{Cejka2020}) it will only be described briefly.
 
 \par For each algorithm (Crout method and Iterative Crout method) a suite of unit tests was written. The aim of the tests was to verify that a matrix was decomposed within some reasonable error range which was obtained by comparing the decomposition result to either existing solutions or solutions computed by programs, such as MATLAB\footnote{MATLAB website URL: \url{https://www.mathworks.com/products/matlab.html}}. Examples of tests are:
 
@@ -533,7 +533,7 @@ The benchmarking procedure is initiated from a Bash script\footnote{Benchmark sc
 
 Additionally, the log file can be transformed into an HTML table and data such as bandwidth and relative speedup can be plotted into graphs using a convenient Python script\footnote{Transforming Python script GitLab repository URL: \url{https://mmg-gitlab.fjfi.cvut.cz/gitlab/tnl/lu-decomposition/-/blob/master/src/Benchmark/scripts/decomposition-benchmark-make-tables-json.py}} - originally adopted from TNL and later modified.
 
-As mentioned in Section~3.2 of the author's bachelor thesis \textit{Formats for storage of sparse matrices on GPU} \cite{Cejka2020}, benchmarks can be used to identify issues missed by unit tests. This claim persisted during the development of this project as some matrices were too large to be stored using \code{DenseMatrix} on the GPU. Furthermore, the benchmark implementation played a crucial role when optimizing the solution.
+As mentioned in Section~3.2 of the author's bachelor thesis \emph{Formats for storage of sparse matrices on GPU} \cite{Cejka2020}, benchmarks can be used to identify issues missed by unit tests. This claim persisted during the development of this project as some matrices were too large to be stored using \code{DenseMatrix} on the GPU. Furthermore, the benchmark implementation played a crucial role when optimizing the solution.
 
 
 
