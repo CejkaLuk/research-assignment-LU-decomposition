@@ -45,6 +45,8 @@
 \DeclareFieldFormat{labelnumberwidth}{\mkbibbrackets{#1}} % Square brackets around numbers in the bibliography
 \setcounter{biburllcpenalty}{7000}						  % Insert breakpoints after lowercase letters in URLs in the bibliography
 \setcounter{biburlucpenalty}{8000}						  % Insert breakpoints after uppercase letters in URLs in the bibliography
+\usepackage{csquotes}									  % Ensure that quoted texts are typeset according to the rules of the main language
+\usepackage{xurl}										  % URL formatting: better linebreaks in footnotes, etc.
 
 % Tables:
 \usepackage{tabularx}			 % Advanced table options
@@ -65,6 +67,8 @@
 \pagestyle{plain}      % Page numbering at the bottom center
 
 \parindent=0pt 		   % Indentation of the 1st line of the paragraph
+
+\setlength{\emergencystretch}{17.5pt} % Allow compiler to create more spaces between words to avoid overflow of text
 
 
 %%% Custom colors:

@@ -194,7 +194,7 @@ The performance of ICM8 - as shown in Figure~\ref{Graph:benchmark-results-bandwi
 \begin{wrapfigure}{r}{.5\textwidth}
 	\centering
 	\includegraphics[width=.35\textwidth, keepaspectratio, clip]{images/ch3/matrices/legresley_2508.png}
-	\caption{Nonzero element pattern of the \mbox{\textit{LeGresley\_2508}} matrix. Taken from the \emph{The university of Florida sparse matrix collection} \cite{Davis2011}.}
+	\caption{Nonzero element pattern of the \textit{LeGresley\_2508} matrix. Taken from the \emph{The university of Florida sparse matrix collection} \cite{Davis2011}.}
 	\label{Figure:benchmark-results-bandwidth-of-the-implementations-matrix-legresley_2508}
 \end{wrapfigure}
 
@@ -535,7 +535,7 @@ In other words, the matrix that results from multiplying the matrices obtained f
 		\begin{tikzpicture}
 			\begin{axis}
 				[
-				,width=\textwidth
+				,width=0.98\textwidth % Slightly slimmer than \textwidth to avoid warning in console for overfull \hbox
 				,height=0.45\textwidth
 				,axis x line*=bottom
 				,axis y line*=left
@@ -560,7 +560,7 @@ In other words, the matrix that results from multiplying the matrices obtained f
 		\begin{tikzpicture}
 			\begin{axis}
 				[
-				,width=\textwidth
+				,width=0.98\textwidth % Slightly slimmer than \textwidth to avoid warning in console for overfull \hbox
 				,height=0.45\textwidth
 				,axis x line*=bottom
 				,axis y line*=left
@@ -643,7 +643,7 @@ This section aims to show the evolution of the ICM$ x $ implementations througho
 		\hline
 		CPU              & Intel(R) Core(TM) i9-9900KF CPU @ 3.60GHz (8 cores, 16 threads) \\
 		RAM              & 62GB RAM \\
-		GPU              & $ 2\times $ Nvidia GeForce RTX 3060 12GB GDDR6 (360 GByte/s memory bandwidth) \\
+		GPU              & $ 2\times $ Nvidia GeForce RTX 3060 12GB GDDR6 (360 GByte/s mem. bandwidth) \\
 		Operating System & Arch Linux (Kernel Version: 5.18.8) \\
 		Compiler         & GCC 12.1.1 \\
 		CUDA             & CUDA 11.7 \\ \hline
@@ -682,7 +682,7 @@ Note that the \textit{Base}, \textit{SM}, and \textit{SM opt.} optimizations all
 	\begin{tikzpicture}
 		\begin{axis}
 			[
-			,width=\textwidth
+			,width=0.98\textwidth % Slightly slimmer than \textwidth to avoid warning in console for overfull \hbox
 			,height=0.65\textwidth
 			,axis x line*=bottom
 			,axis y line*=left
