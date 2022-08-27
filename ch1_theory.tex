@@ -120,7 +120,7 @@ Nvidia GPUs, on the other hand, are engineered to have many smaller controlling 
 		Manufacturing Process & TSMC 16nm & Samsung 8N & 12 nm FFN & 7 nm N7\\
 		\hline
 	\end{tabular}
-	\caption{Comparison of GPUs: GTX 1070 (Turing architecture), RTX 3060 (Ampere architecture), V100 (Volta architecture), A100 (Ampere architecture). The GPUs in this table assume the best possible configuration of their respective card, for example, the version with the most possible VRAM. Features that are important when it comes to card performance have been denoted in green. The data was obtained from various sources for the GTX 1070 \cite{Hagedoorn6October2016, oaUUFoT7oI5ApIyY, Smith18May2016, jAnwkq6mMKYTLUOB} the RTX 3060 \cite{Walton7July2021, wGXr33zSUweXiQMY, SMhyh0H3oh3nlda0, May1December2020} and the A100 \cite{soj8qSRbfefUdi8Y, rfiOEXAGDlcAOxF3}.}
+	\caption{Comparison of GPUs: GTX 1070 (Turing architecture), RTX 3060 (Ampere architecture), V100 (Volta architecture), A100 (Ampere architecture). The GPUs in this table assume the best possible configuration of their respective card, for example, the version with the most possible VRAM. Features that are important when it comes to card performance have been denoted in green. The data was obtained from various sources for the GTX 1070 \cite{Hagedoorn6October2016, oaUUFoT7oI5ApIyY, Smith18May2016, jAnwkq6mMKYTLUOB} the RTX 3060 \cite{Walton7July2021, wGXr33zSUweXiQMY, SMhyh0H3oh3nlda0, May1December2020}, the V100 \cite{NvidiaAugust2017} and the A100 \cite{soj8qSRbfefUdi8Y, rfiOEXAGDlcAOxF3}.}
 	\label{Table:Nvidia-gpu-details-comparison}
 \end{table}
 
@@ -165,7 +165,6 @@ To execute thousands of threads simultaneously, SMs of an Nvidia GPU use the Sin
 	\caption{Conditional code execution by a warp of 8 threads; each thread is represented by one wavy line. Due to the condition, threads with an ID between \code{0} and \code{3} will only execute statements \code{A} and \code{B}. However, simultaneously, threads with IDs between \code{4} and \code{7} will be put on hold. Comparably, while threads with IDs between \code{4} and \code{7} will be executing statements \code{X} and \code{Y}, the remaining threads will be idle. Thus, thread divergence has occurred within the 8-thread warp. Taken from Nvidia's developer blog post: \emph{Inside Volta: The World's Most Advanced Data Center GPU} \cite{Durant10May2017}.}
 	\label{Figure:CUDA-warp-thread-divergence}
 \end{figure}
-\footnotetext{L. Durant, O. Giroux, M. Harris: \emph{Inside Volta: The World’s Most Advanced Data Center GPU}. URL: \protect\url{https://devblogs.nvidia.com/inside-volta/}}
 
 \paragraph{Block}\label{Paragraph:CUDA-thread-management-block}
 It is not always necessary to use such granularity that warps are able to provide. Developers can choose to execute code on a group of up to 1024 threads (with CUDA Compute Capability greater than 3.5) - referred to as a block. Threads in a block can cooperate via shared memory (subsection \ref{Subsection:memory-management} will explain more) and they can be synchronized - this is not possible for threads in different blocks. Threads in a block can be structured in 1, 2, or 3 dimensions (x, y, z); each thread has a unique ID in every dimension. The 1024 threads-per-block limit encompasses all 3 possible dimensions, in other words, the total number of threads must be at most 1024 across all dimensions (\code{num\_threads\_x\_dim} $ \cdot $ \code{num\_threads\_y\_dim} $ \cdot $ \code{num\_threads\_z\_dim} $ \leq$ 1024) \cite{AbiChahla18June2008, NVIDIAMay2022}.
@@ -510,7 +509,7 @@ for( int i = 0; i < 2; ++i ) {
 
 \paragraph{Default stream}\label{Paragraph:CUDA-asynchronous-concurrent-execution-streams-default-stream}
 If a stream is not specified when launching a kernel, or when copying memory, then only the default stream - \textit{Stream '0'} - is used and the instruction are executed in order with respect to the device (not concurrently as shown in the examples above) \cite{NVIDIAMay2022}. \\
-Nevertheless, it is possible to provide each host thread with its own default stream by setting the \code{---default-stream} compilation flag to \code{per-thread}, i.e. compiling using \code{nvcc ... ---default-stream per-thread}. \\
+Nevertheless, it is possible to provide each host thread with its own default stream by setting the \code{----default-stream} compilation flag to \code{per-thread}, i.e. compiling using \code{nvcc ... ----default-stream per-thread}. \\
 The default option for the flag is \code{legacy}, which signifies that all host threads will use the special \textit{NULL stream}. This stream is different from other streams as it uses implicit synchronization - detailed below in paragraph~\ref{Paragraph:CUDA-asynchronous-concurrent-execution-streams-implicit-synchronization}.
 
 \paragraph{Explicit synchronization}\label{Paragraph:CUDA-asynchronous-concurrent-execution-streams-explicit-synchronization}
@@ -723,7 +722,7 @@ Before introducing the specifics of each example, their similarities will be pre
 First, the task that will be performed is matrix multiplication:
 
 \begin{equation}\label{Equation:matrix-multiplication-definition}
-	\mathbb{C} = \mathbb{A} \cdot \mathbb{B}
+	\mathbb{C} = \mathbb{A} \cdot \mathbb{B} \,.
 \end{equation}
 
 In the context of this operation all matrix dimensions are assumed such that it is a legal operation. Additionally, for simplicity, the dimensions of the matrices are assumed to be multiples of the thread block size. This limitation can be avoided by allocating an extra row and column of blocks in the grid and setting a boundary condition in the kernel - each of the two examples (global vs shared memory) require slightly different approaches which will be described later. \\
@@ -999,9 +998,7 @@ In other words, allocation and copying of the matrices was not included in the m
 	\renewcommand{\arraystretch}{1.5}
 	\begin{tabular}{ |c|r|r| } 
 		\hline
-		& \multicolumn{2}{c|}{Results [msec]} \\
-		\hline
-		\multicolumn{1}{|c}{Matrix dimensions} & \multicolumn{1}{|c}{Without shared memory} & \multicolumn{1}{|c|}{With shared memory} \\
+		\multicolumn{1}{|c|}{Matrix dimensions} & \multicolumn{1}{c|}{Without shared memory} & \multicolumn{1}{c|}{With shared memory} \\
 		\hline
 		160 x 160 & 0.028 & 0.013 \\
 		\hline
@@ -1160,9 +1157,9 @@ This method differs from similar procedures in that the resulting $ \mathbb{U} $
 The Crout matrix decomposition algorithm is based on sequentially filling in matrices $ \mathbb{L}_{n\times n} $ and $ \mathbb{U}_{n\times n} $ using elements from matrix $ \mathbb{A}_{n\times n} $. At the core of this filling-in are the following formulas and their conditions for $ l_{ij} $ and $ u_{ij} $:
 
 \begin{align}
-	l_{ij} &= a_{ij} - \sum_{k=1}^{j-1}l_{ik}u_{kj} 								   &\quad i \geq j\,, \label{Equation:LU-decomposition-crout-method-lij} \\
-	u_{ij} &= \frac{1}{l_{ii}} \left ( a_{ij} - \sum_{k=1}^{i-1}l_{ik}u_{kj} \right ), &\quad i < j\,, \\ \label{Equation:LU-decomposition-crout-method-uij}
-	u_{ij} &= 1 																	   &\quad i = j\,, \\
+	l_{ij} &= a_{ij} - \sum_{k=1}^{j-1}l_{ik}u_{kj} 								  &\quad i \geq j\,, \label{Equation:LU-decomposition-crout-method-lij} \\
+	u_{ij} &= \frac{1}{l_{ii}} \left ( a_{ij} - \sum_{k=1}^{i-1}l_{ik}u_{kj} \right ) &\quad i < j\,, \\ \label{Equation:LU-decomposition-crout-method-uij}
+	u_{ij} &= 1 																	  &\quad i = j\,, \\
 	i,j &\in \widehat{n} \nonumber\,.
 \end{align}
 
@@ -1239,8 +1236,8 @@ Specifically, the algorithm is as follows:
 		\end{align}
 	\item Using the formulas in Equations~\ref{Equation:LU-decomposition-crout-method-lij} and \ref{Equation:LU-decomposition-crout-method-lij} calculate the next iteration of $ \mathbb{L}^{t} $ and $ \mathbb{U}^{t} $ (where $ t \in \widehat{\mathbb{N}}_0 $ denotes the iteration): $ \mathbb{L}^{t+1} $ and $ \mathbb{U}^{t+1} $
 		\begin{align}
-			l_{ij}^{t+1} &= a_{ij} - \sum_{k=1}^{j-1}l_{ik}^{t}u_{kj}^{t} 								   &\quad i \geq j \nonumber\,, \\
-			u_{ij}^{t+1} &= \frac{1}{l_{ii}^{t}} \left ( a_{ij} - \sum_{k=1}^{i-1}l_{ik}^{t}u_{kj}^{t} \right ) &\quad i < j \\ \nonumber\,.
+			l_{ij}^{t+1} &= a_{ij} - \sum_{k=1}^{j-1}l_{ik}^{t}u_{kj}^{t} 								   		&\quad i \geq j \nonumber\,, \\
+			u_{ij}^{t+1} &= \frac{1}{l_{ii}^{t}} \left ( a_{ij} - \sum_{k=1}^{i-1}l_{ik}^{t}u_{kj}^{t} \right ) &\quad i < j    \nonumber\,. 
 		\end{align}
 	\item If either $ \left | \mathbb{L}^{t+1} - \mathbb{L}^{t} \right | $ or $ \left | \mathbb{U}^{t+1} - \mathbb{U}^{t} \right | $ is greater than some tolerance, e.g. $ 0.001 $, then go back to step 2.
 	\item If both differences are smaller than the tolerance, then the algorithm has iteratively converged to an approximate solution of $ \mathbb{A} = \mathbb{LU} $.

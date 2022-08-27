@@ -11,11 +11,11 @@
 \usepackage{listings} 			 % Code formatting package
 
 % Fonts:
-\usepackage[hidelinks]{hyperref} % Hide square around URL link.
+\usepackage[hidelinks]{hyperref} % Hide square around URL link
 \usepackage{amsmath}  			 % Advanced mathematic package
 \usepackage{xcolor}    			 % Colorful text
 \usepackage{soul}				 % Text fonts syllable by syllable - used for in-text codifying
-\usepackage[varg]{txfonts}		 % Times New Roman fonts and math alphabets, for example, provides \mathbb{}.
+\usepackage[varg]{txfonts}		 % Times New Roman fonts and math alphabets, for example, provides \mathbb{}
 
 % Graphics:
 \usepackage{graphicx} 			 % Insert raster graphic files (PNG etc.)
@@ -26,7 +26,7 @@
 \usepackage{subcaption}			 % Sub-captions of figures, tables, etc. 
 \usepackage{nicematrix, tikz}	 % Visual representation of matrices, graphs etc. - 'nicematrix' is experimental
 \usetikzlibrary{plotmarks, positioning, fit}
-\usetikzlibrary{decorations.pathreplacing, matrix, calc} % EXPERIMENTAL
+\usetikzlibrary{decorations.pathreplacing, matrix, calc}
 \usepackage{pgfplots} 			 % For visualizations, graphics, etc.
 \pgfplotsset{compat=1.3}		 % Use pgfplots version 1.3 specifically
 
@@ -58,7 +58,7 @@
 \brokenpenalty=9500    % Prohibit page breaks after a line that has a split word at the end
 
 \geometry{verbose,tmargin=4cm,bmargin=3cm,lmargin=3cm,rmargin=2cm,headheight=0.8cm,headsep=1cm,footskip=0.5cm} % Setup from bachelor thesis - provides more space for the content on a page
-\raggedbottom 		   % All pages the height of the text on that page. No extra vertical space is added.
+\raggedbottom 		   % All pages the height of the text on that page. No extra vertical space is added
 \pagenumbering{arabic} % Page numbering in Arabic numerals
 \pagestyle{plain}      % Page numbering at the bottom center
 
@@ -110,19 +110,19 @@
 	morekeywords={gridDim.x},
 	morekeywords={__shared__},
 	morekeywords={dim3},
-	alsoletter={.}				% Make the font be applied for dots
+	alsoletter={.}			   % Make the font be applied for dots
 }
 
 
 %%% Custom commands:
-\newcommand{\ti}{\textit} 								  % Shortcut for cursive font
-\newcommand{\tb}{\textbf} 								  % Shortcut for bold fond
-
-\newcommand{\code}[1]{\colorbox{light-gray}{\texttt{#1}}}
+\newcommand{\ti}{\textit} 								  									   % Shortcut for cursive font
+\newcommand{\tb}{\textbf} 								  									   % Shortcut for bold fond
+\DeclareRobustCommand{\code}[1]{{\begingroup\sethlcolor{light-gray}\hl{\texttt{#1}}\endgroup}} % Shortcut for code font in text
+\soulregister{\code}{1}
 
 %% Status of writing:
-\newcommand{\TODO}{\textcolor{red}{TODO}}   		   % To Do command
-\newcommand{\TO}{\textcolor{nvidia}{TO}} 			   % Writing To Be Checked by Supervisor (Tomas Oberhuber)
+\newcommand{\TODO}{\textcolor{red}{TODO}}   		   % To-Do command
+\newcommand{\TO}{\textcolor{nvidia}{TO}} 			   % Writing to-be checked by the supervisor (Tomas Oberhuber)
 
 
 %%% Constants
@@ -223,7 +223,7 @@
 \newpage  			  % DO NOT TOUCH!
 \thispagestyle{empty} % DO NOT TOUCH!
 
-% Task paper scanned as a 2-page PDF:
+% Task paper scanned as a 1-page PDF:
 \includepdf[pages={1}]{resources/vyz-zadani-cejka.pdf}
 
 
@@ -249,8 +249,8 @@
 \declarationEN
 \selectlanguage{czech}%
 
-\vspace{2em}  									 							  % DO NOT TOUCH!
-\hspace{-0.5em}\begin{tabularx}{\textwidth}{X c} 							  % DO NOT TOUCH!
+\vspace{2em}  									 							    % DO NOT TOUCH!
+\hspace{-0.5em}\begin{tabularx}{\textwidth}{X c} 							    % DO NOT TOUCH!
 V \place\ dne .................... &........................................ \\ % DO NOT TOUCH!
 	& \paperAuthor
 \end{tabularx} % DO NOT TOUCH!
@@ -267,7 +267,7 @@ V \place\ dne .................... &........................................ \\ 
 
 \tb{Poděkování}
 
-\vspace{1em} % Vertical space. % DO NOT TOUCH!
+\vspace{1em} 				% Vertical space. % DO NOT TOUCH!
 \acknowledgementCZ
 
 \selectlanguage{american}%
@@ -275,11 +275,11 @@ V \place\ dne .................... &........................................ \\ 
 \tb{Acknowledgment}
 
 \selectlanguage{czech}%
-\vspace{1em} % Vertical space. % DO NOT TOUCH!
+\vspace{1em} 				% Vertical space. % DO NOT TOUCH!
 \acknowledgementEN
 \begin{flushright}
 \paperAuthor
-\end{flushright}  % Acknowledgement page ends here
+\end{flushright}  			% Acknowledgement page ends here
 
 
 

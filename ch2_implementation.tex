@@ -772,7 +772,7 @@ Additionally, the interval for the size of the section in the first version of \
 \subparagraph{Section size dependent on maximum active threads}\label{Subparagraph:implementation-optimization-section-size-dependent-on-maximum-active-threads}
 The first explored improvement aimed to tailor the solution to the capabilities of the GPU used for the computation. The concept of the maximum number of active threads was explained in \textit{\nameref{Paragraph:CUDA-thread-management-grid}} in Section~\ref{Paragraph:CUDA-thread-management-grid} and in \textit{\nameref{Paragraph:CUDA-asynchronous-concurrent-execution-concurrent-kernel-execution}} in Section~\ref{Paragraph:CUDA-asynchronous-concurrent-execution-concurrent-kernel-execution}. The maximum number of active threads for a specific GPU can be obtained using the following formula:
 \begin{equation}
-	\mathrm{maxActiveThreads} = \mathrm{SMcount}\cdot \mathrm{maxThreadsPerSM} \nonumber\,,
+	max\_active\_threads = sm\_count\cdot max\_threads\_per\_sm \nonumber\,,
 \end{equation}
 which can be implemented using the CUDA \code{cudaDeviceProp}\footnote{\code{cudaDeviceProp} Struct Reference URL: \url{https://docs.nvidia.com/cuda/cuda-runtime-api/structcudaDeviceProp.html}} structure as shown in Listing~\ref{Listing:implementation-optimization-section-size-dependent-on-maximum-active-threads}.
 
