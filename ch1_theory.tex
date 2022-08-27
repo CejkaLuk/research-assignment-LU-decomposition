@@ -410,7 +410,7 @@ Further caveats associated with the use of mapped memory can be found in \emph{C
 \begin{figure}[h!]
 	\centering
 	\includegraphics[width=\textwidth, keepaspectratio]{images/ch1/nvidia_gpu_sms_cuda.png}
-	\caption{a) Usual architecture of an Nvidia Fermi GPU that comprises of SMs. Furthermore, each SM is made up of SP cores (Stream Processor cores) b) CUDA programming model controls the hardware of the GPU. Taken from \textit{Accelerating Fibre Orientation Estimation from Diffusion Weighted Magnetic Resonance Imaging Using GPUs} \cite{Hernandez2013429}.}
+	\caption{a) Usual architecture of an Nvidia Fermi GPU that comprises of SMs. Furthermore, each SM is made up of SP cores (Stream Processor cores) b) CUDA programming model controls the hardware of the GPU. Taken from \emph{Accelerating Fibre Orientation Estimation from Diffusion Weighted Magnetic Resonance Imaging Using GPUs} \cite{Hernandez2013429}.}
 	\label{Figure:Nvidia-GPU-structure-CUDA-thread-structure}
 \end{figure}
 
@@ -470,7 +470,7 @@ Therefore, whether kernels can be run concurrently is highly dependent on the re
 
 \subsubsection{Streams}\label{Subsubsection:CUDA-asynchronous-concurrent-execution-concurrent-streams}
 Streams can be used to effectively create and manage concurrency on the device, in other words, they are the means by which the above-mentioned operations are controlled. According to \emph{CUDA C/C++ Streams and Concurrency} by Steve Rennich and Nvidia a CUDA \textit{stream} can be defined as "A sequence of operations that execute in issue-order on the GPU" \cite{sk7jHd5INXJOAEUe}. To put it another way, a single stream is basically an open door through which instructions can be sent to the device - kernels. \\
-While it is possible to have multiple streams active at once, the device has limited resource available (active threads and memory). Therefore, multiple active streams at once does not necessarily mean multiple kernels running simultaneously. Nevertheless, if multiple streams are active and each is given a different kernel, then these kernels can be executed concurrently if the device's limits are not overstepped - detailed above in paragraph \textit{Concurrent kernel execution} in Section\ref{Paragraph:CUDA-asynchronous-concurrent-execution-concurrent-kernel-execution}. \\
+While it is possible to have multiple streams active at once, the device has limited resource available (active threads and memory). Therefore, multiple active streams at once does not necessarily mean multiple kernels running simultaneously. Nevertheless, if multiple streams are active and each is given a different kernel, then these kernels can be executed concurrently if the device's limits are not overstepped - detailed above in paragraph \textit{\nameref{Paragraph:CUDA-asynchronous-concurrent-execution-concurrent-kernel-execution}} in Section\ref{Paragraph:CUDA-asynchronous-concurrent-execution-concurrent-kernel-execution}. \\
 Unlike individual kernels, global memory is used by all streams without division, i.e. all streams have access to the same global memory and there is no part of global memory that would belong to a particular stream. \\
 According to Nvidia's \emph{CUDA C++ Programming Guide} \cite{NVIDIAMay2022}, individual streams are not dependent on each other, meaning that they are able to execute commands separately or concurrently. However, this behavior does not have to be consistent, for example, communication between kernels is not define. For this reason, Nvidia themselves recommend not relying on the accuracy of CUDA applications when attempting to make streams interact. \\
 On the other hand, CUDA provides tools that can assist when synchronicity of streams is required. \\
@@ -612,7 +612,7 @@ int main()
 }
 \end{lstlisting}
 
-\paragraph{Kernels}
+\paragraph{Kernels}\label{Paragraph:theory-CUDA-c++-CUDA-extensions-kernels}
 While the term \textit{kernel} was introduced earlier in Section~\ref{Subsection:CUDA-introductory-terminology}, the technical details will be covered in this part. In order to differentiate a kernel from a function, the \code{\_\_global\_\_} modifier must be used. Another distinction that kernels have compared to regular functions is the kernel launch configuration which has the following specific syntax: \code{$<$$<$$<$ numBlocks, threadsPerBlock, sharedMemSize,} \code{stream $>$$>$$>$} where \cite{NVIDIAMay2022, Cejka2020}:
 
 \begin{itemize}
@@ -648,7 +648,7 @@ int main()
 In the part above, the \code{\_\_global\_\_} modifier was introduced as a specifier for functions that are to be considered kernels. Along with it, CUDA brings other function modifiers, or, as Nvidia calls them: \textit{execution space specifiers} \cite{NVIDIAMay2022}:
 
 \begin{itemize}
-	\item \code{\_\_global\_\_} - Modifier declaring that a function can be called from both the host and the device (as of compute capability 3.2 or higher). However, it can only be executed on the device. Additionally, a function denoted with this modifier must not belong to any class and it can only have a void return type. Furthermore, the launch configuration mentioned above in the \textit{Kernels} paragraph must be specified for each call.
+	\item \code{\_\_global\_\_} - Modifier declaring that a function can be called from both the host and the device (as of compute capability 3.2 or higher). However, it can only be executed on the device. Additionally, a function denoted with this modifier must not belong to any class and it can only have a void return type. Furthermore, the launch configuration mentioned above in the \textit{\nameref{Paragraph:theory-CUDA-c++-CUDA-extensions-kernels}} paragraph must be specified for each call.
 	\item \code{\_\_device\_\_} - Modifier declaring that a function can only be called from and executed on the device. This means that it can only be called from within kernels.
 	\item \code{\_\_host\_\_} - Modifier declaring that a functions can only be called from and executed on the host. This means that it can only be called from regular functions, not kernels.
 \end{itemize}
