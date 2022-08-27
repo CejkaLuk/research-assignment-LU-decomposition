@@ -484,26 +484,28 @@ A CUDA stream is created by initializing a stream object - type \code{cudaStream
 cudaStream_t streams[2];
 
 // Create each stream
-for (int i = 0; i < 2; ++i)
-	cudaStreamCreate(&streams[i]);
+for( int i = 0; i < 2; ++i ) {
+	cudaStreamCreate( &streams[i] );
+}
 \end{lstlisting}
 
 In order to make a kernel run on a specific stream, the stream address must be specified as one of the launch parameters of the kernel - detailed in Subsection~\ref{Subsection:CUDA-C++-extensions}. Launching a kernel on a specific stream is shown in Listing~\ref{Listing:run-kernels-on-streams}.
 
 \begin{lstlisting}[caption={Pseudo-code for launching 2 different kernels using 2 different streams. The instructions in this example would be executed from the host. Since each kernel is essentially an open door to the device for instructions, then, once \code{MyKernelA} is launched on \code{stream[0]}, the control is returned to the host without waiting for \code{MyKernelA} to finish. Subsequently, the host will immediately launch \code{MyKernelB} using \code{stream[1]}. In this example, each kernel is launched on a grid made up of 1 single-thread block with 0 bytes of dynamic shared memory allocated, thus, the devic resources will not be exhausted and both kernels will run concurrently. Taken from Nvidia's \emph{CUDA C++ Programming Guide} \cite{NVIDIAMay2022}.},label={Listing:run-kernels-on-streams}]
 // Launch MyKernelA using the 0th stream using 1 block made up of 1 thread and 0 bytes of dynamically allocated shared memory
-MyKernelA<<<1, 1, 0, stream[0]>>>(inputVariableA)
+MyKernelA<<< 1, 1, 0, stream[0] >>>( inputVariableA )
 
 // Launch MyKernelB using the 1st stream
-MyKernelB<<<1, 1, 0, stream[1]>>>(inputVariableB)
+MyKernelB<<< 1, 1, 0, stream[1] >>>( inputVariableB )
 \end{lstlisting}
 
 When streams are no longer needed, they are to be destroyed using \code{cudaStreamDestroy()} - show below in Listing~\ref{Listing:streams-destruction}. If \code{cudaStreamDestroy()} is called while a stream is still performing tasks, then it will return without destroying the stream immediately - the destruction (release) of the stream's resources will be delayed until all work is completed on the stream.
 
 \begin{lstlisting}[caption={Destruction of streams. Taken from Nvidia's \emph{CUDA C++ Programming Guide} \cite{NVIDIAMay2022}.},label={Listing:streams-destruction}]
 // Destroy each stream
-for (int i = 0; i < 2; ++i)
-	cudaStreamDestroy(stream[i]);
+for( int i = 0; i < 2; ++i ) {
+	cudaStreamDestroy( stream[i] );
+}
 \end{lstlisting}
 
 \paragraph{Default stream}\label{Paragraph:CUDA-asynchronous-concurrent-execution-streams-default-stream}
@@ -576,34 +578,38 @@ Expanding on the memory operations mentioned above, CUDA provides memory space s
 
 Listing~\ref{Code:CUDA-memory-managing-extensions-example} shows an example of how memory managing functions can be used in a host-device code that copies arrays.
 
-\begin{lstlisting}[caption= Example of code that utilizes CUDA memory managing extensions of C++. Taken from \textit{Formats for storage of sparse matrices on GPU} \cite{Cejka2020} and Nvidia's \emph{Getting Started with CUDA} presentation \cite{Ruetsch2008}.,label=Code:CUDA-memory-managing-extensions-example]
-	int main(void)
-	{
-		float *a_h, *b_h; // data that will be allocated on host
-		float *a_d, *b_d; // data that will be allocated on device
-		int N = 14, nBytes, i;
-		
-		nBytes = N * sizeof( float ); // required allocation size
-		a_h = (float *) malloc( nBytes ); // allocating host data
-		b_h = (float *) malloc( nBytes ); 
-		cudaMalloc( (void **) &a_d, nBytes ); // allocating device data
-		cudaMalloc( (void **) &b_d, nBytes );
-		
-		// filling up host data
-		for( i = 0, i < N; i++ ) a_h[ i ] = 100.f + i;
-		
-		// copying data from host -> device -> device -> host
-		cudaMemcpy( a_d, a_h, nBytes, cudaMemcpyHostToDevice );
-		cudaMemcpy( b_d, a_d, nBytes, cudaMemcpyDeviceToDevice );
-		cudaMemcpy( b_h, b_d, nBytes, cudaMemcpyDeviceToHost );
-		
-		// checking that all data is equal
-		for( i = 0; i < N; i++ ) assert( a_h[ i ] == b_h[ i ] );
-		
-		free( a_h ); free( b_h ); // freeing data on host
-		cudaFree( a_d ); cudaFree( b_d ); // freeing data on device
-		return 0;
+\begin{lstlisting}[caption= Example of code that utilizes CUDA memory managing extensions of C++. Taken from \emph{Formats for storage of sparse matrices on GPU} \cite{Cejka2020} and Nvidia's \emph{Getting Started with CUDA} presentation \cite{Ruetsch2008}.,label=Code:CUDA-memory-managing-extensions-example]
+int main()
+{
+	float *a_h, *b_h; // data that will be allocated on host
+	float *a_d, *b_d; // data that will be allocated on device
+	int N = 14, nBytes, i;
+	
+	nBytes = N * sizeof( float ); // required allocation size
+	a_h = (float *) malloc( nBytes ); // allocating host data
+	b_h = (float *) malloc( nBytes ); 
+	cudaMalloc( (void **) &a_d, nBytes ); // allocating device data
+	cudaMalloc( (void **) &b_d, nBytes );
+	
+	// filling up host data
+	for( i = 0, i < N; ++i ) {
+		a_h[i] = 100.f + i;
 	}
+
+	// copying data from host -> device -> device -> host
+	cudaMemcpy( a_d, a_h, nBytes, cudaMemcpyHostToDevice );
+	cudaMemcpy( b_d, a_d, nBytes, cudaMemcpyDeviceToDevice );
+	cudaMemcpy( b_h, b_d, nBytes, cudaMemcpyDeviceToHost );
+	
+	// checking that all data is equal
+	for( i = 0; i < N; ++i ) {
+		assert( a_h[i] == b_h[i] );
+	}
+
+	free( a_h ); free( b_h ); // freeing data on host
+	cudaFree( a_d ); cudaFree( b_d ); // freeing data on device
+	return 0;
+}
 \end{lstlisting}
 
 \paragraph{Kernels}
@@ -622,7 +628,7 @@ On the other hand if \code{threadsPerBlock} is a \code{dim3} variable, then the 
 
 \begin{lstlisting}[caption={Example of C++ pseudocode of a Kernel launch on a grid consisting of 1 one-dimensional block that is made up of 8 threads. Taken from Nvidia's \emph{CUDA C++ Programming Guide} \cite{NVIDIAMay2022}.},label={Listing:CUDA-kernel-example}]
 // Kernel definition
-__global__ void MyKernel(float a, float b, float c)
+__global__ void MyKernel( float a, float b, float c )
 {
 	// Kernel code here
 }
@@ -632,8 +638,8 @@ int main()
 	...
 	// Kernel invocation on a grid with 1 block of 8 * 1 * 1 threads
 	int numBlocks = 1;
-	dim3 threadsPerBlock(8); // Defaults to (8, 1, 1)
-	MyKernel<<<numBlocks, threadsPerBlock>>>(a, b, c);
+	dim3 threadsPerBlock( 8 ); // Defaults to (8, 1, 1)
+	MyKernel<<< numBlocks, threadsPerBlock >>>( a, b, c );
 	...
 }
 \end{lstlisting}
@@ -667,28 +673,29 @@ The \code{globalID} is useful when working with matrices, for example, adding 2 
 
 \begin{lstlisting}[caption={Example of C++ pseudocode of a kernel that adds 2 matrices using 2-dimensional thread blocks. Since each thread has a unique \code{globalID} for each of 2 dimensions, then those IDs can be used as indices for adding matrix elements. This simple example does not take into account allocation and copying data from host to device. Taken from Nvidia's \emph{CUDA C++ Programming Guide} \cite{NVIDIAMay2022}.},label={Listing:CUDA-matrix-addition-example}]
 // Kernel definition
-__global__ void MatAdd(float A[N][N], float B[N][N], float C[N][N])
+__global__ void MatAdd( float A[N][N], float B[N][N], float C[N][N] )
 {
 	// Get thread ID for each dimension -> use as matrix indices
 	int i = blockIdx.x * blockDim.x + threadIdx.x;
 	int j = blockIdx.y * blockDim.y + threadIdx.y;
 	
 	// Check if the IDs are within the dimensions of the matrices
-	if (i < N && j < N)
+	if( i < N && j < N ) {
 		C[i][j] = A[i][j] + B[i][j];
+	}
 }
 
 int main()
 {
 	...
 	// Number of threads per each 2-dimensional block is 16x16 = 256
-	dim3 threadsPerBlock(16, 16);
+	dim3 threadsPerBlock( 16, 16 );
 	
 	// Number of blocks in the grid depends on the matrix dimension (NxN)
-	dim3 numBlocks(N / threadsPerBlock.x, N / threadsPerBlock.y);
+	dim3 numBlocks( N / threadsPerBlock.x, N / threadsPerBlock.y );
 	
 	// Kernel launch: A + B = C
-	MatAdd<<<numBlocks, threadsPerBlock>>>(A, B, C);
+	MatAdd<<< numBlocks, threadsPerBlock >>>( A, B, C );
 	...
 }
 \end{lstlisting}
@@ -724,7 +731,7 @@ Let each matrix be represented by a structure \code{Matrix}:
 
 \begin{lstlisting}[caption={Definition of the structure that will represent a matrix. The \code{width} variable stores the number of columns and \code{height} stores the number of rows the matrix has. The elements of the matrix are stored in row-major order in the single-precision (float) array: \code{values}. Taken from Nvidia's \emph{CUDA C++ Programming Guide} \cite{NVIDIAMay2022}.},label={Listing:CUDA-matrix-multiplication-matrix-structure-definition}]
 // Matrices are stored in row-major order:
-// M(row, col) = *(M.values + row * M.width + col)
+// M( row, col ) = *( M.values + row * M.width + col )
 typedef struct {
 	int width;
 	int height;
@@ -810,9 +817,10 @@ __global__ void MatMulKernel( Matrix A, Matrix B, Matrix C )
 	float Cvalue = 0;
 	int row = blockIdx.y * blockDim.y + threadIdx.y;
 	int col = blockIdx.x * blockDim.x + threadIdx.x;
-	for( int i = 0; i < A.width; ++i )
+	for( int i = 0; i < A.width; ++i ) {
 		Cvalue += A.values[row * A.width + i] * B.values[i * B.width + col];
-	
+	}
+
 	C.values[row * C.width + col] = Cvalue;
 }
 \end{lstlisting}
@@ -853,11 +861,11 @@ The visualization of this approach is shown in Figure~\ref{Figure:CUDA-matrix-mu
 // Matrix multiplication kernel called by MatMul()
 __global__ void MatMulKernel( Matrix A, Matrix B, Matrix C )
 {
-	// Block row and column - indices of the sub-matrices within A and B respectively
+	// Block row and column - indices of the submatrices within A and B respectively
 	int blockRow = blockIdx.y;
 	int blockCol = blockIdx.x;
 	
-	// Each thread block computes one sub-matrix Csub of C
+	// Each thread block computes one submatrix Csub of C
 	Matrix Csub = GetSubMatrix( C, blockRow, blockCol );
 	
 	// Each thread computes one element of Csub by accumulating results into Cvalue
@@ -867,13 +875,13 @@ __global__ void MatMulKernel( Matrix A, Matrix B, Matrix C )
 	int row = threadIdx.y;
 	int col = threadIdx.x;
 	
-	// Loop over all the sub-matrices of A and B that are required to compute Csub by multiplying each pair of sub-matrices together and accumulate the results
-	for( int i = 0; i < (A.width / BLOCK_SIZE); ++i ) {
+	// Loop over all the submatrices of A and B that are required to compute Csub by multiplying each pair of submatrices together and accumulate the results
+	for( int i = 0; i < ( A.width / BLOCK_SIZE ); ++i ) {
 		
-		// Get sub-matrix Asub of A
+		// Get submatrix Asub of A
 		Matrix Asub = GetSubMatrix( A, blockRow, i );
 		
-		// Get sub-matrix Bsub of B
+		// Get submatrix Bsub of B
 		Matrix Bsub = GetSubMatrix( B, i, blockCol );
 		
 		// Shared memory used to store Asub and Bsub respectively
@@ -881,17 +889,18 @@ __global__ void MatMulKernel( Matrix A, Matrix B, Matrix C )
 		__shared__ float Bs[BLOCK_SIZE][BLOCK_SIZE];
 		
 		// Load Asub and Bsub from device memory to shared memory
-		// Each thread loads one element of each sub-matrix
+		// Each thread loads one element of each submatrix
 		As[row][col] = GetElement( Asub, row, col );
 		Bs[row][col] = GetElement( Bsub, row, col );
 		
-		// Synchronize to make sure the sub-matrices are loaded before starting the computation
+		// Synchronize to make sure the submatrices are loaded before starting the computation
 		__syncthreads();
 		// Multiply Asub and Bsub together
-		for( int k = 0; k < BLOCK_SIZE; ++k )
+		for( int k = 0; k < BLOCK_SIZE; ++k ) {
 			Cvalue += As[row][k] * Bs[k][col];
+		}
 		
-		// Synchronize to make sure that the preceding computation is done before loading two new sub-matrices of A and B in the next iteration
+		// Synchronize to make sure that the preceding computation is done before loading two new submatrices of A and B in the next iteration
 		__syncthreads();
 	}
 	
@@ -1159,39 +1168,43 @@ The Crout matrix decomposition algorithm is based on sequentially filling in mat
 
 Specifically, the algorithm first computes a column $ j $ in $ \mathbb{L} $ and then row $ j $ in $ \mathbb{U} $. This process repeats itself for $ j $ from $ 1 $ to $ n $. The pseudo-code implementing the algorithm can be seen in Listing~\ref{Listing:LU-decomposition-crout-method-pseudocode} and the visualization of the algorithm's advance is shown in Figure~\ref{Figure:LU-decomposition-crout-method-visualisation}.
 
-\begin{lstlisting}[caption={C++ Pseudo-code implementing Crout's matrix decomposition algorithm. It assumes that \code{A[n][n]} is a two-dimensional array that represents the invertible square coefficient matrix $ \mathbb{A} $; \code{L[n][n]} and \code{U[n][n]} are also two-dimensional arrays reprenting matrices $ \mathbb{L} $ and $ \mathbb{U} $ respectively. Furthermore, it is assumed that \code{L} and \code{U} are populated with zeros. Derived from \emph{Crout's LU Factorization} \cite{rqjYYJkSwERYYbSy}, \emph{Numerical recipes: the art of scientific computing} \cite{Press2007} and \emph{Crout matrix decomposition} \cite{TgtpOw7zCHo3ii0m}.},label={Listing:LU-decomposition-crout-method-pseudocode}]
-void crout_method(A, L, U) {
+\begin{lstlisting}[caption={C++ pseudo-code implementing Crout's matrix decomposition algorithm. It assumes that \code{A[n][n]} is a two-dimensional array that represents the invertible square coefficient matrix $ \mathbb{A} $; \code{L[n][n]} and \code{U[n][n]} are also two-dimensional arrays reprenting matrices $ \mathbb{L} $ and $ \mathbb{U} $ respectively. Furthermore, it is assumed that \code{L} and \code{U} are populated with zeros. Derived from \emph{Crout's LU Factorization} \cite{rqjYYJkSwERYYbSy}, \emph{Numerical recipes: the art of scientific computing} \cite{Press2007} and \emph{Crout matrix decomposition} \cite{TgtpOw7zCHo3ii0m}.},label={Listing:LU-decomposition-crout-method-pseudocode}]
+void crout_method( A, L, U )
+{
 	int i, j, k;
 	double sum = 0;
 	
 	// Fill main diagonal of U with 1s
-	for (i = 0; i < n; i++) {
+	for( i = 0; i < n; ++i ) {
 		U[i][i] = 1;
-	}
-	
+	}	
+
 	// Loop through the main diagonal
-	for (j = 0; j < n; j++) {
+	for( j = 0; j < n; ++j ) {
 		
 		// Compute column j in L
-		for (i = j; i < n; i++) {
+		for( i = j; i < n; ++i ) {
 			sum = 0;
-			for (k = 0; k < j; k++) {
-				sum += L[i][k] * U[k][j];	
+			for( k = 0; k < j; ++k ) {
+				sum += L[i][k] * U[k][j];
 			}
+
 			L[i][j] = A[i][j] - sum;
 		}
 		
 		// Compute row j in U
-		for (i = j; i < n; i++) {
+		for( i = j; i < n; ++i ) {
 			sum = 0;
-			for(k = 0; k < j; k++) {
+			for( k = 0; k < j; ++k ) {
 				sum = sum + L[j][k] * U[k][i];
 			}
-			if (L[j][j] == 0) {
-				printf("det(L) close to 0!\n Can't divide by 0...\n");
-				exit(EXIT_FAILURE);
+
+			if( L[j][j] == 0 ) {
+				printf( "det(L) close to 0!\n Can't divide by 0...\n" );
+				exit( EXIT_FAILURE );
 			}
-			U[j][i] = (A[j][i] - sum) / L[j][j];
+
+			U[j][i] = ( A[j][i] - sum ) / L[j][j];
 		}
 	}
 }

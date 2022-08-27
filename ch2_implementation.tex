@@ -47,12 +47,14 @@ void setElements()
 	TNL::Matrices::DenseMatrix< double, Device > matrix( 5, 5 );
 	
 	// Set elements of the main diagonal using setElement()
-	for( int i = 0; i < 5; i++ )
+	for( int i = 0; i < 5; ++i ) {
 		matrix.setElement( i, i, i );
-	
+	}
+
 	// Increment elements of the main diagonal using operator()
-	for( int i = 0; i < 5; i++ )
+	for( int i = 0; i < 5; ++i ) {
 		matrix( i, i ) += i;
+	}
 }
 
 int main( int argc, char* argv[] )
@@ -323,16 +325,16 @@ void CroutMethodIterative::decompose( Matrix1& A, Matrix2& Z )
 	
 	// Allocate and initialize an array of 2 stream handles
 	int nstreams = 2;
-	cudaStream_t *streams = (cudaStream_t *)malloc(nstreams * sizeof(cudaStream_t));
-	for (int i = 0; i < nstreams; i++) {
-		cudaStreamCreate(&(streams[i]));
+	cudaStream_t *streams = (cudaStream_t *)malloc( nstreams * sizeof(cudaStream_t) );
+	for( int i = 0; i < nstreams; ++i ) {
+		cudaStreamCreate( &(streams[i] ) );
 	}
 	
 	// Initialize variables for keeping track of where the main diagonal section begins and ends
 	Index diag_start, diag_end, sStart, sEnd;
 	
 	// Converge by sections
-	for( diag_start = 0, diag_end = min( num_cols, sectionSize ); diag_start < diag_end; diag_start += sectionSize, diag_end = min( num_cols, diag_end + sectionSize) ) {
+	for( diag_start = 0, diag_end = min( num_cols, sectionSize ); diag_start < diag_end; diag_start += sectionSize, diag_end = min( num_cols, diag_end + sectionSize ) ) {
 		// Converge the diagonal section first using the Default stream
 		do {
 			*converged_host = true;
@@ -424,7 +426,7 @@ __global__ void DecomposeKernel( const Matrix1* _A, Matrix2* _Z, Matrix2* _Znew,
 	Index i, k;
 	
 	// Compute the sum needed for element (row, col) by loading blocks of elements from global to shared memory and multiplying them
-	for ( i = 0; i <= min_row_col; i += BLOCK_SIZE ) {
+	for( i = 0; i <= min_row_col; i += BLOCK_SIZE ) {
 		ZsLower[ty][tx] = Z( new_row, i + tx );
 		ZsUpper[ty][tx] = Z( i + ty, new_col );
 		
@@ -460,6 +462,7 @@ __global__ void DecomposeKernel( const Matrix1* _A, Matrix2* _Z, Matrix2* _Znew,
 			printf( "Key element: %f\t(row:%d, col:%d)\n", Z( row, row ), (int)row, (int)col );
 			assert( Z( row, row ) != 0 );
 		}
+
 		Znew( row, col ) = ( A( row, col ) - sum ) / Z( row, row );
 	}
 	
@@ -613,7 +616,7 @@ These three kernel would then be called in every iteration of the \code{do-while
 	do
 	{
 		*converged_host = true;
-		cudaMemcpy(converged_kernel, converged_host, sizeof(bool), cudaMemcpyHostToDevice);
+		cudaMemcpy( converged_kernel, converged_host, sizeof(bool), cudaMemcpyHostToDevice );
 		
 		DecomposeKernel< RealType ><<< blocksPerGrid, threadsPerBlock >>>( matrixA_kernel, matrixZ_kernel, matrixZnew_kernel, num_rows );
 		
@@ -621,7 +624,7 @@ These three kernel would then be called in every iteration of the \code{do-while
 		
 		MatrixAssignKernel<<< blocksPerGrid, threadsPerBlock >>>( matrixZ_kernel, matrixZnew_kernel, num_rows );
 		
-		cudaMemcpy(converged_host, converged_kernel, sizeof(bool), cudaMemcpyDeviceToHost);
+		cudaMemcpy( converged_host, converged_kernel, sizeof(bool), cudaMemcpyDeviceToHost );
 	} while( !*converged_host );
 \end{lstlisting}
 
@@ -636,13 +639,13 @@ The core of the decomposition kernel from the multiple kernel setup was still th
 	
 	RealType sum = 0;
 	
-	for (int i = 0; i <= num_rows; i += BLOCK_SIZE) { @\label{Line:implementation-optimization-convergence-by-tiles-using-shared-memory-outer-for-begin}@
+	for( int i = 0; i <= num_rows; i += BLOCK_SIZE ) { @\label{Line:implementation-optimization-convergence-by-tiles-using-shared-memory-outer-for-begin}@
 		__shared__ RealType ZsLower[BLOCK_SIZE][BLOCK_SIZE];
 		__shared__ RealType ZsUpper[BLOCK_SIZE][BLOCK_SIZE];
 		
 		// Possible non-coalesced global memory access and thread divergence
-		ZsLower[ty][tx] = (row >= num_rows || i + tx >= num_rows) ? 0 : Z->getElement( row, i + tx );
-		ZsUpper[ty][tx] = (col >= num_rows || i + ty >= num_rows) ? 0 : Z->getElement( i + ty, col );
+		ZsLower[ty][tx] = ( row >= num_rows || i + tx >= num_rows ) ? 0 : Z->getElement( row, i + tx );
+		ZsUpper[ty][tx] = ( col >= num_rows || i + ty >= num_rows ) ? 0 : Z->getElement( i + ty, col );
 		
 		// Synchronize to make sure the matrices are loaded
 		__syncthreads();
@@ -654,7 +657,7 @@ The core of the decomposition kernel from the multiple kernel setup was still th
 			// If row < BLOCK_SIZE or col < BLOCK_SIZE, then use the for loop without pragma unroll
 			if( col >= glob_id ) {
 				#pragma unroll
-				for( int k = 0; k < BLOCK_SIZE; ++k ) {
+				for( int k = 0; k < BLOCK_SIZE; k++ ) {
 					sum += ZsLower[ty][k] * ZsUpper[k][tx];
 				}
 			} else {
@@ -666,11 +669,11 @@ The core of the decomposition kernel from the multiple kernel setup was still th
 		} else {
 			if( row >= glob_id ) {
 				#pragma unroll
-				for( int k = 0; k < BLOCK_SIZE; ++k ) {
+				for( int k = 0; k < BLOCK_SIZE; k++ ) {
 					sum += ZsLower[ty][k] * ZsUpper[k][tx];
 				}
 			} else {
-				for( int k = 0; k < ty; ++k ) {
+				for( int k = 0; k < ty; k++ ) {
 					sum += ZsLower[ty][k] * ZsUpper[k][tx];
 				}
 				break;
@@ -725,7 +728,7 @@ As mentioned in \textit{\nameref{Paragraph:implementation-optimization-calculati
 	// Since all threads in a block either need to end their calculations in a submatrix, or they all do not
 	// Submatrices are iterated until the loops gets to a submatrix where the threads would need to end their calculations
 	// This means that the threads would need to end their calculation before BLOCK_SIZE and the pragma loop could not be used In that case, a loop specific is needed for that thread
-	for ( i = 0; i <= min_row_col; i += BLOCK_SIZE ) {
+	for( i = 0; i <= min_row_col; i += BLOCK_SIZE ) {
 		ZsLower[ty][tx] = Z( new_row, i + tx );
 		ZsUpper[ty][tx] = Z( i + ty, new_col );
 		
@@ -776,15 +779,15 @@ which can be implemented using the CUDA \code{cudaDeviceProp}\footnote{\code{cud
 \begin{lstlisting}[caption={Code detailing the calculation of the size of a section based on the the maximum number of active threads for a given GPU. The structure \code{cudaDeviceProp} contains properties and information about the given CUDA device. Taken from the Decomposition project repository on GitLab\protect\footref{Footnote:decomposition-project-gitlab-url}.},label={Listing:implementation-optimization-section-size-dependent-on-maximum-active-threads},escapechar=@]
 	int cuda_device = 0;
 	cudaDeviceProp deviceProp;
-	cudaGetDevice(&cuda_device);
-	cudaGetDeviceProperties(&deviceProp, cuda_device);
+	cudaGetDevice( &cuda_device );
+	cudaGetDeviceProperties( &deviceProp, cuda_device );
 	
 	int maxActiveThreads = deviceProp.multiProcessorCount * deviceProp.maxThreadsPerMultiProcessor;
 	
 	// Two (sectionSize x sectionSize) sections will be running in parallel at most
-	int sectionSize = sqrt(maxActiveThreads/2);
+	int sectionSize = sqrt( maxActiveThreads / 2 );
 	// Round sectionSize to a multiple of BLOCK_SIZE
-	sectionSize = (sectionSize/BLOCK_SIZE)*BLOCK_SIZE; // WHY IS THIS DIFFERENT FROM THE PREVIOUS WAY TO CALCULATE sectionSize
+	sectionSize = ( sectionSize / BLOCK_SIZE ) * BLOCK_SIZE;
 \end{lstlisting}
 
 While this change significantly improved the speed of execution, the results it produced were less accurate than that of the final implementation. It seems that the same behavior as when \code{sectionSize} was set below $ 256 $ - described at the end of \textit{\nameref{Paragraph:implementation-optimization-elimination-of-conditions}} - occurred. Since a solution to the problem of inaccuracy was not found, this change was not accepted.

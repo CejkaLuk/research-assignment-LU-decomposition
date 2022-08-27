@@ -290,7 +290,8 @@ const dim3 &dimsB) {
 /**
 * Program main
 */
-int main(int argc, char **argv) {
+int main(int argc, char **argv)
+{
 	printf("[Matrix Multiply Using CUDA] - Starting...\n");
 	
 	if (checkCmdLineFlag(argc, (const char **)argv, "help") ||
@@ -414,26 +415,23 @@ void CroutMethod::decompose( Matrix1& A, Matrix2& L, Matrix3& U )
 	IndexType i, j, k;
 	RealType sum = 0;
 	
-	for( j = 0; j < num_rows; ++j )
-	{
-		for( i = j; i < num_rows; ++i )
-		{
+	for( j = 0; j < num_rows; ++j )	{
+		for( i = j; i < num_rows; ++i ) {
 			sum = 0;
-			for( k = 0; k < j; ++k )
-			sum = sum + L.getElement( i, k ) * U.getElement( k, j );
-			
+			for( k = 0; k < j; ++k ) {
+				sum = sum + L.getElement( i, k ) * U.getElement( k, j );
+			}
+		
 			L.setElement( i, j, A.getElement( i, j ) - sum );
 		}
 		
-		for( i = j; i < num_rows; ++i )
-		{
-			TNL_ASSERT( L.getElement( j, j ) != 0,
-			std::cerr << "L( " << i << ", " << j <<
-			" ) = 0. Cannot divide by 0." << std::endl );
+		for( i = j; i < num_rows; ++i ) {
+			TNL_ASSERT( L.getElement( j, j ) != 0, std::cerr << "L( " << i << ", " << j << " ) = 0. Cannot divide by 0." << std::endl );
 			sum = 0;
-			for( k = 0; k < j; ++k )
-			sum = sum + L.getElement( j, k ) * U.getElement( k, i );
-			
+			for( k = 0; k < j; ++k ) {
+				sum = sum + L.getElement( j, k ) * U.getElement( k, i );
+			}
+		
 			U.setElement( j, i, ( A.getElement( j, i ) - sum ) / L.getElement( j, j ) );
 		}
 	}	
@@ -455,28 +453,25 @@ void CroutMethod::decompose( Matrix1& A, Matrix2& Z )
 	IndexType i, j, k;
 	RealType sum = 0;
 	
-	for( j = 0; j < num_rows; ++j )
-	{
-		for( i = j; i < num_rows; ++i )
-		{
+	for( j = 0; j < num_rows; ++j )	{
+		for( i = j; i < num_rows; ++i ) {
 			sum = 0;
-			for( k = 0; k < j; ++k )
-			sum = sum + Z.getElement( i, k ) * Z.getElement( k, j );
-			
+			for( k = 0; k < j; ++k ) {
+				sum = sum + Z.getElement( i, k ) * Z.getElement( k, j );
+			}
+		
 			Z.setElement( i, j, A.getElement( i, j ) - sum );
 		}
 		
-		for( i = j; i < num_rows; ++i )
-		{
+		for( i = j; i < num_rows; ++i ) {
 			if( j == i ) continue;
 			
-			TNL_ASSERT( Z.getElement( j, j ) != 0,
-			std::cerr << "Z( " << j << ", " << j <<
-			" ) = 0. Cannot divide by 0." << std::endl );
+			TNL_ASSERT( Z.getElement( j, j ) != 0, std::cerr << "Z( " << j << ", " << j << " ) = 0. Cannot divide by 0." << std::endl );
 			sum = 0;
-			for( k = 0; k < j; ++k )
+			for( k = 0; k < j; ++k ) {
 			sum = sum + Z.getElement( j, k ) * Z.getElement( k, i );
-			
+			}
+
 			Z.setElement( j, i, ( A.getElement( j, i ) - sum ) / Z.getElement( j, j ) );
 		}
 	}
