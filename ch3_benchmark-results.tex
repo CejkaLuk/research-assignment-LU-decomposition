@@ -67,7 +67,7 @@ This section will present and analyze the benchmark results obtained from decomp
 \paragraph{Benchmark terminology} The terminology used in the analysis of the benchmark results is both common and adjusted to this project. It will be briefly explained in the context of the benchmark below:
 
 \begin{itemize}
-	\item \textbf{Bandwidth} - The amount of data that can be read from or written to device memory by the device within a specified time interval \cite{F4RUu4doMdeEMKXX}. This rate of data transfer is measured in Bytes per second (Byte/s), however, given the evolution in computation it is most-often measured in Gigabytes (GByte/s) - or even Terabytes (TByte/s) with the recently launched Nvidia A100 as shown in Table~\ref{Table:Nvidia-gpu-details-comparison}. According to Section~8.2.2 in \emph{CUDA C++ Best Practices Guide} \cite{F4RUu4doMdeEMKXX} effective bandwidth is defined as
+	\item \textbf{Bandwidth} - The amount of data that can be read from or written to device memory by the device within a specified time interval \cite{F4RUu4doMdeEMKXX}. This rate of data transfer is measured in Bytes per second (Byte/s), however, given the evolution in computation it is most often measured in Gigabytes (GByte/s) - or even Terabytes (TByte/s) with the recently launched Nvidia A100 as shown in Table~\ref{Table:Nvidia-gpu-details-comparison}. According to Section~8.2.2 in \emph{CUDA C++ Best Practices Guide} \cite{F4RUu4doMdeEMKXX} effective bandwidth is defined as
 		\begin{equation}
 			\frac{\left(B_r + B_w\right)/10^9}{execution\_time} \nonumber\,,
 		\end{equation}
@@ -656,7 +656,7 @@ Furthermore, a subset of the 63 set of matrices was used for measuring the perfo
 
 \begin{itemize}
 	\item The initial implementations on the GPU were egregiously slow, thus, only sparse matrices smaller than $ 6,000\times 6,000 $ were used at the time.
-	\item The final set of 63 matrices underwent numerous changes as newly-found matrices were added throughout the development process. Only once the GPU implementation became adequately performant, larger and dense matrices were added. Once the set was completed, there was an attempt to re-do the benchmark results for key optimizations, however, the compute cluster time limit was not sufficient as the decomposition of some dense matrices would require up to two days with the initial implementations.
+	\item The final set of 63 matrices underwent numerous changes as newly-found matrices were added throughout the development process. Only once the GPU implementation became adequately performant, larger and dense matrices were added. Once the set was completed, there was an attempt to redo the benchmark results for key optimizations, however, the compute cluster time limit was not sufficient as the decomposition of some dense matrices would require up to two days with the initial implementations.
 \end{itemize}
 
 The set of matrices that was used to measure performance during development comprised of 50 sparse matrices with dimensions ranging from $ 27\times 27 $ to $ 5,832\times 5,832 $.
