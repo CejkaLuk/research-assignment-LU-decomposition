@@ -13,7 +13,7 @@ As described in Section~1.2 of the author's bachelor thesis \emph{Formats for st
 
 \par For reference, high-end desktop CPUs today usually have anywhere from 8 to 16 cores, while server CPUs can have upwards of 64 cores (not counting hyper-threading and similar technologies). In general, CPUs with more cores have a lower clock speed - see Figure~\ref{Figure:processor-comparison} for a selection of processors along with their core count and clock speeds \cite{Glawion7March2022}.
 
-\begin{figure}[H]
+\begin{figure}[ht!]
 	\centering
 	\includegraphics[width=14cm, keepaspectratio]{images/ch1/processors_comparison.png}
 	\caption{Selection of desktop and server CPUs - including number of cores and clock speed \cite{Glawion7March2022}. HEDT stands for High-End Desktop Processor - in this instance it also includes CPUs predominantly used in servers.}
@@ -22,7 +22,7 @@ As described in Section~1.2 of the author's bachelor thesis \emph{Formats for st
 
 While CPUs are widely used for sequential tasks, they can also be used for tasks that can be described as parallelizable, for example, processing of requests to a server. They are not suitable for highly parallel tasks such as image processing, where GPUs excel due to their architecture. Figure~\ref{Figure:Nvidia-CPU-GPU-architecture-comparison} shows the comparison of a CPU and GPU architecture. The example CPU in the figure has - among other components - 4 cores each having its own L1 cache and controlling component. This configuration allows for executing a thread (series of operations) at a high speed and lower throughput (fewer number of threads running at once). Simply, the CPU is more suitable for rapid completion of serialized instructions.
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
 	\centering
 	\includegraphics[width=14cm, keepaspectratio]{images/ch1/nvidia_CPU_GPU_comparison.png}
 	\caption{Comparison of the architecture of CPUs and GPUs. On one hand, CPUs have fewer cores, more complex controlling logic compared to GPUs and the cores of a CPU have a higher clock speed. On the other hand, GPUs have a much higher number of cores clocked at lower speeds. Taken from Nvidia's \emph{CUDA C++ programming guide} \cite{NVIDIAMay2022}.}
@@ -34,7 +34,7 @@ Nvidia GPUs, on the other hand, are engineered to have many smaller controlling 
 
 \par For completion, see Table~\ref{Table:Nvidia-gpu-details-comparison} for a selection of GPUs along with their specifications.
 
-\begin{table}[h!]
+\begin{table}[ht!]
 	\centering
 	\renewcommand{\arraystretch}{0.9}
 	\begin{tabular}{|>{\raggedright\arraybackslash\bfseries\scriptsize}m{2.7cm}|>{\scriptsize}m{2.7cm}|>{\scriptsize}m{2.7cm}|>{\scriptsize}m{2.7cm}|>{\scriptsize}m{2.7cm}|}
@@ -149,7 +149,7 @@ This section will aim to describe how CUDA handles its basic execution units: th
 The thread management system within CUDA begins, at the most basic level, with its smallest execution unit, a thread. According to \emph{CUDA C++ Programming Guide} a thread is an executed sequence of operations \cite{NVIDIAMay2022}. Due to the highly parallel nature of the GPU - spreading the workload across thousands of execution units - a CUDA thread is designed to be lightweight (unlike a typical CPU thread - assuming no hyper-threading is present). In this context, 'lightweight' signifies that the GPU is capable of easily switching between threads. An example showing how a set of instructions can be run on a set of 8 threads can be seen in Figure~\ref{Figure:CUDA-thread-parallelism}. \\
 In this project, the terms 'CUDA thread' and 'thread' will be used interchangeably. For a more detailed explanation of the difference between a CUDA thread and that of the CPU see \emph{Formats for storage of sparse matrices on GPU} \cite{Cejka2020}.
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
 	\centering
 	\includegraphics[width=9.5cm, keepaspectratio, clip]{images/ch1/CUDA_thread_parallelism.jpg}
 	\caption{On an Nvidia GPU, eight threads with IDs from \code{0} to \code{7} execute the code in this example. A value from the array \code{input} with \code{threadID} as the index (i.e. each thread will read a value at a different index) is changed using the function \code{func(x)} and then stored in the same order as before into the array \code{output}. Taken from \emph{Format for storage of sparse matrices on GPU} \cite{Cejka2020, Ruetsch2008}.}
@@ -159,7 +159,7 @@ In this project, the terms 'CUDA thread' and 'thread' will be used interchangeab
 \paragraph{Warp}\label{Paragraph:CUDA-thread-management-warp}
 To execute thousands of threads simultaneously, SMs of an Nvidia GPU use the Single-Instruction Multiple-Thread (SIMT) execution model. The abbreviation SIMT comes from the amalgamation of SIMD (Single-Instruction Multiple-Data) and multi-threading (executing multiple sequences of instructions simultaneously). Specifically, this approach comprises of multiple threads executing the same computations on different data items \cite{Marziale2010}. In terms of CUDA, the core of the SIMT architecture is a so-called 'warp' that is made up of 32 threads. In other words, the smallest number of threads that can be executed simultaneously is 32. If fewer threads are required, for example, only one thread, then CUDA will still allocate 32 threads with 31 being inactive. Similarly, if a subset of threads from a warp are to execute different instructions (e.g., as a result of a conditional statement) then the different sets of instructions are executed serially across their respective threads - this issue is known as 'thread divergence'. An example of thread divergence can be seen in Figure~\ref{Figure:CUDA-warp-thread-divergence}; the warp in the example is simplified for the purpose of the explanation and as such contains only 8 threads.
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
 	\centering
 	\includegraphics[width=14cm, keepaspectratio]{images/ch1/CUDA_warp_divergence_execution_path.jpg}
 	\caption{Conditional code execution by a warp of 8 threads; each thread is represented by one wavy line. Due to the condition, threads with an ID between \code{0} and \code{3} will only execute statements \code{A} and \code{B}. However, simultaneously, threads with IDs between \code{4} and \code{7} will be put on hold. Comparably, while threads with IDs between \code{4} and \code{7} will be executing statements \code{X} and \code{Y}, the remaining threads will be idle. Thus, thread divergence has occurred within the 8-thread warp. Taken from Nvidia's developer blog post: \emph{Inside Volta: The World's Most Advanced Data Center GPU} \cite{Durant10May2017}.}
@@ -173,7 +173,7 @@ It is not always necessary to use such granularity that warps are able to provid
 In terms of CUDA a grid consists of multiple blocks of threads. Similarly to how threads can be structured within blocks, blocks can be structured within grids - up to 3 dimensions of blocks; each block has a unique ID in every dimension. The maximum number of blocks in every dimension is set to $ 2^{31} - 1 $ (65 536). One of the main reasons for having another structure on top of blocks (apart from memory management - detailed explanation in Section~\ref{Subsection:memory-management}) stems from the fact that while the limit for threads per block is set to 1024, GPUs are capable of running a multitude more threads in parallel. This means that the grid structure allows for the same code to be executed simultaneously on a group of thread blocks. However, it is important to note that there is a limit of how many threads can be active at once. When this limit is reached, blocks of threads are executed sequentially in such a way that allows for near-maximal concurrently active threads. Another noteworthy aspect is the difference between the terms 'number of allocated threads' and 'number of active threads'. The former means how many threads are allocated in total, i.e. both active (currently executing) and inactive (scheduled) threads, whereas the latter refers to threads that are actively being executed at a point in time. \\
 A visualization of CUDA's thread structuring can be seen in Figure~\ref{Figure:CUDA-grid-block-thread}.
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
 	\centering
 	\includegraphics[width=11cm, keepaspectratio]{images/ch1/nvidia_grid_block_thread.png}
 	\caption{CUDA thread structuring of a 2D grid made up of 2D blocks of threads. Taken from Nvidia's \emph{CUDA C++ Programming Guide} \cite{NVIDIAMay2022}.}
@@ -197,7 +197,7 @@ As of CUDA Compute Capability 3.5, the amount of purely local memory available f
 \paragraph{Shared memory}\label{Paragraph:CUDA-memory-management-shared-memory}
 The next layer of memory is per-block memory referred to as \textit{shared memory}. As the name suggests, this memory is shared by all threads belonging to a particular block. Similarly to registers, shared memory is on-chip and therefore it is fast, however, it is also limited in capacity depending on the CUDA Compute Capability version - see table \ref{Table:CUDA-block-max-shared-memory} for specific values.
 
-\begin{table}[h!]
+\begin{table}[ht!]
 	\centering
 	\renewcommand{\arraystretch}{1.5}
 	\begin{tabular}{ |c|c|c|c|c|c|c| } 
@@ -213,7 +213,7 @@ The next layer of memory is per-block memory referred to as \textit{shared memor
 
 Shared memory can either be allocated statically or dynamically. The former needs the size of allotted memory to be known at compile time, for example, an array of constant size denoted within the kernel using a dedicated prefix that indicates it is meant to be stored in the shared memory of each thread's block. On the other hand, the latter - dynamic allocation of shared memory - allows for the size of required memory to be determined at runtime, however, this means that the developer must specify the size of the shared memory as one of the parameters when calling the kernel. \\
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
 	\centering
 	\includegraphics[width=11cm, keepaspectratio]{images/ch1/CUDA_memory_types_detailed.png}
 	\caption{Different CUDA memory types visualized. Each thread has access to its local memory comprised of registers, local memory (blue squares in global memory), shared memory of its block, and global memory. Taken from Yao Hsiao's \emph{GPU - CUDA introduction} \cite{Hsiao17December2019}.}
@@ -222,7 +222,7 @@ Shared memory can either be allocated statically or dynamically. The former need
 
 Shared memory of each block is divided into 32-bit (4-byte) memory modules called words. A single word can store a float, half a double, 32-bit int, etc. - anything that can be stored in 32 bits. Apart from words, there are 32 banks per block. Each bank contains a number of words depending on the size of shared memory allocated. Since the size of shared memory can be up to 48 KB or more - depending on the version of CUDA Compute Capability - then the number of words per bank can differ between versions. Figure~\ref{Figure:CUDA-shared-memory-banks-words} visualizes the division of shared memory into banks and words.
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
 	\centering
 	\begin{subfigure}{\textwidth}
 		\centering
@@ -249,7 +249,7 @@ However, the operations above all assumed good conditions for reading and writin
 In order to facilitate further understanding, examples from \emph{Cuda succinctly} \cite{Rose2017} and \emph{CUDA C++ Programming Guide} \cite{NVIDIAMay2022} are included below. \\
 Firstly, Table~\ref{Table:CUDA-shared-memory-access-patterns} presents different shared memory access patterns - including notes on the speed of execution. Then, Figure~\ref{Figure:CUDA-shared-memory-banks-words-no-conflicts} portrays shared memory access using random permutations, multicast and broadcast. Finally, Figure~\ref{Figure:CUDA-shared-memory-banks-words-conflicts} shows examples of strided shared memory access with and without bank conflict - additionally, this figure also visualizes some examples from Table~\ref{Table:CUDA-shared-memory-access-patterns}.
 
-\begin{table}[h!]
+\begin{table}[ht!]
 	\centering
 	\renewcommand{\arraystretch}{1.5}
 	\begin{tabular}{ |l|l| } 
@@ -275,14 +275,14 @@ Firstly, Table~\ref{Table:CUDA-shared-memory-access-patterns} presents different
 	\label{Table:CUDA-shared-memory-access-patterns}
 \end{table}
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
 	\centering
 	\includegraphics[width=11cm, keepaspectratio]{images/ch1/CUDA_shared_memory_banks_words_no_conflicts.png}
 	\caption{Irregular shared memory accesses on 3 separate examples; yellow rectangular cuboids are banks; small orange rectangles are words. The left sub-image shows threads of a warp accessing shared memory randomly, however, in such a way that does not cause bank conflicts. The middle sub-image shows shared memory accessed by threads using the multicast operation, specifically, threads 3, 4, 5, 6, 7 and 9 accessing the same word from bank 5; other threads all access one word any bank each - no bank conflict. The right sub-image shows threads accessing shared memory via two broadcast operations. Taken from Nvidia's \emph{CUDA C++ Programming Guide} \cite{NVIDIAMay2022}.}
 	\label{Figure:CUDA-shared-memory-banks-words-no-conflicts}
 \end{figure}
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
 	\centering
 	\includegraphics[width=11cm, keepaspectratio]{images/ch1/CUDA_shared_memory_banks_words_conflicts.png}
 	\caption{Shared memory access using striding on 3 separate examples; yellow rectangular cuboids are banks; small orange rectangles are words. The left sub-image shows threads of a warp accessing shared memory with a stride of 1 (no bank conflict). The middle sub-image shows shared memory accessed by threads with a stride of 2 (equivalent to \code{arr[tID*2]} from Table~\ref{Table:CUDA-shared-memory-access-patterns}; two-way bank conflict as threads access two different words from the same bank). The right sub-image shows threads accessing shared memory with a stride of 3 (equivalent to \code{arr[tID*3]} from Table~\ref{Table:CUDA-shared-memory-access-patterns}; no bank conflict). Taken from Nvidia's \emph{CUDA C++ Programming Guide} \cite{NVIDIAMay2022}.}
@@ -294,7 +294,7 @@ In summary, ensuring that bank conflicts do not occur is pivotal to achieving ef
 \paragraph{Global memory}\label{Paragraph:CUDA-memory-management-global-memory}
 The final, all-accessible memory layer is called \textit{global memory}. Some sources also refer to it as \textit{device memory} since global memory resides in the device's DRAM (Dynamic Random Access Memory) - not to be confused with the host's memory, often referred to as, RAM. The modifier 'global' represents the all-accessible aspect of this type of memory, as it can be accessed by the host and the device, thus, serving as a memory communication medium that can be used to transfer data between the two, and house input and output data for kernels \cite{Harris7January2013}. Global memory is available for all threads on the device, regardless of what thread structure they belong to. In other words, all grids have access to the same global memory - shown in Figure~\ref{Figure:CUDA-memory-management}.
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
 	\centering
 	\includegraphics[width=11cm, keepaspectratio]{images/ch1/CUDA_memory_management.png}
 	\caption{CUDA memory structuring. Taken from Nvidia's \emph{CUDA C++ Programming Guide} \cite{NVIDIAMay2022}.}
@@ -322,7 +322,7 @@ Ad point 2 of the conditions above: when threads of a warp access words larger t
 
 Table~\ref{Table:CUDA-built-in-aligned-vector-types} shows examples of built-in vector types that are aligned in global memory by default; the entire list can be found in Nvidia's \emph{CUDA C++ Programming Guide} \cite{NVIDIAMay2022}.
 
-\begin{table}[h!]
+\begin{table}[ht!]
 	\centering
 	\renewcommand{\arraystretch}{1.5}
 	\begin{tabular}{ |l|l| } 
@@ -358,14 +358,14 @@ On the other hand, if 8-byte or 16-byte words are not aligned, then reading them
 However, ultimately, if the size and alignment requirements are not adhered to, then the access to global memory is compiled into multiple instructions in such a way that they will not be fully coalesced, which leads to lower bandwidth and suboptimal performance. \\
 Examples of coalesced and non-coalesced memory accesses by a 16-thread warp are shown in Figures~\ref{Figure:CUDA-global-memory-coalesced-access} and \ref{Figure:CUDA-global-memory-non-coalesced-access-examples}.
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
 	\centering
 	\includegraphics[width=0.7\textwidth, keepaspectratio]{images/ch1/CUDA_global_memory_coalesced_access.png}
 	\caption{Coalesced access to global memory. Threads are denoted with \code{t<ID>} and the numbers below the rectangular memory locations are global memory addresses. In the upper image, all threads of the warp access successive memory addresses which house words of size 4 bytes (\code{float}), the size of the memory transaction is 64 bytes, and the segment is aligned to its size so that the first address is a multiple of its size: segment is 64 bytes and the starting address is 128: $ 128/64 = 2 $. The lower image shows an example where two threads from the 16-thread warp do not access data. Thus, threads of the warp have two separate execution paths (thread/warp divergence) that are executed sequentially. However, from a memory standpoint, the access is still coalesced as all requirements are fulfilled. Taken from Martínez Manuel Ujaldón's \emph{CUDA Optimizations, Debugging and Profiling} \cite{xUOrKLpxlGjvTonr}.}
 	\label{Figure:CUDA-global-memory-coalesced-access}
 \end{figure}
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
 	\centering
 	\begin{subfigure}{\textwidth}
 		\centering
@@ -406,7 +406,7 @@ Further caveats associated with the use of mapped memory can be found in \emph{C
 
 \par An overview of how the structure of hardware on a GPU and CUDA can be seen in Figure~\ref{Figure:Nvidia-GPU-structure-CUDA-thread-structure}
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
 	\centering
 	\includegraphics[width=\textwidth, keepaspectratio]{images/ch1/nvidia_gpu_sms_cuda.png}
 	\caption{a) Usual architecture of an Nvidia Fermi GPU that comprises of SMs. Furthermore, each SM is made up of SP cores (Stream Processor cores) b) CUDA programming model controls the hardware of the GPU. Taken from \emph{Accelerating Fibre Orientation Estimation from Diffusion Weighted Magnetic Resonance Imaging Using GPUs} \cite{Hernandez2013429}.}
@@ -448,7 +448,7 @@ Another noteworthy aspect is that kernel launches are implicitly synchronous whe
 Similarly to the concept where the device can be running a kernel while the host is performing another task, kernels can be executed simultaneously on the device. Not all Nvidia devices support this functionality (only some devices with compute capability 2 and higher), therefore, it must be checked per-device using the \code{asyncEngineCount} device property (\code{0} if the device supports it). There are 3 main limitations when it comes to concurrent kernel execution: CUDA-defined maximum number of resident grids per device, no concurrent kernels from different CUDA contexts and resources available on the device. First, the CUDA-defined maximum resident grids per device will be explained. \\
 Since each kernel is launched on an individual grid of blocks of threads, then the maximum number of resident grids per device is effectively the maximum number of kernels that can be run concurrently on the device. The limit is a hard-set constant that depends on the compute capability version - Table~\ref{Table:CUDA-maximum-resident-grids-per-device}.
 
-\begin{table}[h!]
+\begin{table}[ht!]
 	\centering
 	\renewcommand{\arraystretch}{1.5}
 	\begin{tabular}{ |c|c|c|c|c|c|c|c|c| } 
@@ -701,7 +701,7 @@ int main()
 
 Accompanying the code in Listing~\ref{Listing:CUDA-matrix-addition-example}, Figure~\ref{Figure:CUDA-GridBlockThread-Structure} visualizes how elements of a matrix can be divided into a grid comprising of 2-dimensional thread blocks.
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
 	\centering
 	\includegraphics[width=0.8\textwidth, keepaspectratio]{images/ch1/CUDA-GridBlockThread-Structure.png}
 	\caption{Grid made up of 2-dimensional thread blocks. Each square represents a thread with its IDs within its block (\code{threadIdx.x}, \code{threadIdx.y}). It can be imagined that each block is a submatrix and together all submatrices make up the full matrix. Taken from \emph{CUDA Parallel Thread Management} \cite{McKennon13June2013}.}
@@ -801,7 +801,7 @@ The first example uses only global memory access, i.e. without shared memory. Th
 The kernel is launched on a grid of thread such that each thread is responsible for calculating exactly one element of the resulting \code{C} matrix. For example, let there be a thread with indices \code{row\_id} and \code{col\_id}. This thread will perform element-wise multiplication of row \code{row\_id} from matrix \code{A} and column \code{col\_id} from matrix \code{B}. Then, it will store the sum of these elements as the resulting value \code{C(row\_id, col\_id)} into matrix \code{C}. \\
 The visualization of this approach is shown in Figure~\ref{Figure:CUDA-matrix-multiplication-without-shared-memory-example} and the kernel is presented in Listing~\ref{Listing:CUDA-matrix-multiplication-without-shared-memory-example}.
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
 	\centering
 	\includegraphics[width=0.8\textwidth, keepaspectratio]{images/ch1/CUDA-matrix-multiplication-without-shared-memory.png}
 	\caption{Visualization of the execution of the kernel that does not use shared memory - shown in Listing~\ref{Listing:CUDA-matrix-multiplication-without-shared-memory-example}. Taken from Nvidia's \emph{CUDA C++ Programming Guide} \cite{NVIDIAMay2022}.}
@@ -836,7 +836,7 @@ The second example uses both global and shared memory. Similarly to the approach
 	\item $ \mathbb{B}_{rect} $ is a \code{B.height x BLOCK\_SIZE} submatrix of \code{B} that has the same column indices as $ \mathbb{C}_{sub} $.
 \end{enumerate}
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
 	\centering
 	\includegraphics[width=0.8\textwidth, keepaspectratio]{images/ch1/CUDA-matrix-multiplication-with-shared-memory.png}
 	\caption{Visualization of the execution of the kernel that uses shared memory - shown in Listing~\ref{Listing:CUDA-matrix-multiplication-with-shared-memory-example}. Taken from Nvidia's \emph{CUDA C++ Programming Guide} \cite{NVIDIAMay2022}.}
@@ -993,7 +993,7 @@ In other words, allocation and copying of the matrices was not included in the m
 	\label{Figure:CUDA-matrix-multiplication-benchmark-results-flops}
 \end{figure}
 
-\begin{table}[h!]
+\begin{table}[ht!]
 	\centering
 	\renewcommand{\arraystretch}{1.5}
 	\begin{tabular}{ |c|r|r| } 
@@ -1207,7 +1207,7 @@ void crout_method( A, L, U )
 }
 \end{lstlisting}
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
 	\centering
 	\includegraphics[width=0.8\textwidth, keepaspectratio]{images/ch1/LU_decomposition_crout_method_visualization.png}
 	\caption{Sequence of computations of the Crout method. First, column $ j $ in $ \mathbb{L} $ is computed and then row $ j $ of $ \mathbb{U} $. Taken from Vismor's \emph{Crout's LU Factorization} \cite{rqjYYJkSwERYYbSy}.}

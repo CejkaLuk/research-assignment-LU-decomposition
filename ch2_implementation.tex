@@ -9,7 +9,7 @@ While TNL contains, among others, many different data structures. For the purpos
 As mentioned at the end of Section~\ref{Subsection:LU-decomposition-numerical-method}, the goal of this project is to combine the parallel nature of CUDA-enabled Nvidia GPUs and the heavily parallelizable algorithm described in the same section (labeled as \textit{Iterative Crout method} for the purpose of this project). \\
 Therefore, in order to store all matrices involved in the computation, an efficient, robust and intuitive data structure was required. While in terms of matrices TNL mainly revolves around sparse implementations (i.e. efficiently storing and performing operations with matrices that have more zero than nonzero elements), it also possesses the opposite: \textit{dense matrices}. As the name suggest, dense matrices are matrix structures densely populated with elements. In other words, a dense matrix stores every single element, regardless of its value (zeros and nonzeros are stored). In TNL, the class representing the dense matrix data structure is called \code{DenseMatrix} and it is located in the \code{TNL::Matrices} namespace. Similarly to the majority of classes representing matrices in TNL, it inherits from the \code{Matrix} class; the visualization of inheritance can be found in Figure~\ref{Figure:implementation-tnl-library-dense-matrix}.
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
 	\centering
 	\includegraphics[width=\textwidth, keepaspectratio]{images/ch2/tnl_matrices_dense_matrix-inheritance.png}
 	\caption{Inheritance diagram for the \code{TNL::Matrices::DenseMatrix} class. Taken from the \emph{Template Numerical Library Documentation} \cite{Ednu6dyrkWKz1Bv2}.}
@@ -242,7 +242,7 @@ The GPU implementation can be split into two parts:
 This part leverages advantages from both the sequential and parallel versions of the Crout method in order to optimize the entire procedure. \\
 Similarly to the Iterative algorithm detailed in Section~\ref{Subsection:LU-decomposition-numerical-method}, the \textit{convergence by sections} concept begins by providing an initial estimate of matrix $ \mathbb{Z} $, for example, $ \mathbb{Z} = \mathbb{A}$. Then, $ \mathbb{Z} $ is divided into submatrices of equal size (in this project, the submatrices are referred to as \textit{sections} and are labeled with $ _{sub} $, for example, $ \mathbb{Z}_{sub} $). Then, beginning in the top-left corner, the sections are sequentially converged (equivalent to a submatrix being decomposed) using the Iterative Crout method algorithm described in Section~\ref{Subsection:LU-decomposition-numerical-method}. The order in which sections are converged is crucial to achieving near-optimal execution times; it is shown in Figure~\ref{Figure:implementation-decomposition-project-lu-decomposition-order-of-convergence-of-sections}.
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
 	\vspace{0.8cm}					  % Add space above figure to make room for the 's' label above the matrix
 	\setlength{\arraycolsep}{24pt}    % Larger gap between columns
 	\renewcommand{\arraystretch}{3.6} % Larger gap between rows
@@ -268,7 +268,7 @@ Similarly to the Iterative algorithm detailed in Section~\ref{Subsection:LU-deco
 
 The order of convergence of sections is derived from the fact that a single element in $ \mathbb{Z} $, for example, $ z_{ij} $ (where $ i,j \in \widehat{n} $), is computed using only some elements above and to the left of it. Specifically, only $ 2x $ (where $ x = \min(i, j) $) elements will be used, i.e. in row $ i $ only columns $ \left[0, x\right] $ and in column $ j $ only rows $ \left[0, x\right] $. This means that the quality of an element's value greatly depends on the quality of the elements used to compute it (quality refers to how close an element is to its final (converged) value in a given iteration). The visualization of what elements are used to compute a single element $ z_{ij} $ is shown in Figure~\ref{Figure:implementation-decomposition-project-lu-decomposition-element-dependance}.
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
 	\centering
 	\begin{subfigure}{.5\textwidth}
 		\centering
@@ -794,7 +794,7 @@ While this change significantly improved the speed of execution, the results it 
 
 \subparagraph{Convergence by anti-diagonal sections} At the end of \textit{\nameref{Subparagraph:implementation-decomposition-project-lu-decomposition-iterative-crout-method-convergence-by-sections}} in Section~\ref{Subparagraph:implementation-decomposition-project-lu-decomposition-iterative-crout-method-convergence-by-sections} it was mentioned that more than two sections can be converged simultaneously. Furthermore, this can be done while still adhering to the general rule of optimal convergence that states: "certain sections above and to the left of a section must be converged in order for the section to converge optimally". In this instance "optimally" means quickly and accurately. Following the rule of optimal convergence, Figure~\ref{Figure:implementation-optimization-convergence-by-anti-diagonal-sections} shows an alternative order of convergence: \textit{Convergence by anti-diagonal sections}.
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
 	\vspace{0.8cm}					  % Add space above figure to make room for the 's' label above the matrix
 	\setlength{\arraycolsep}{24pt}    % Larger gap between columns
 	\renewcommand{\arraystretch}{3.6} % Larger gap between rows

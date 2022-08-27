@@ -14,7 +14,7 @@ The implementations in the \textit{Decomposition} project that were benchmarked 
 \section{Benchmark Platform Specifications \TO}\label{Section:benchmark-results-benchmark-platform-specifications}
 The benchmark was run on the RCI (Research Center for Informatics in CTU Prague) Cluster\footnote{RCI homepage URL: \url{http://rci.cvut.cz/}} which is a HPC (High Performance Computing) infrastructure intended for use mainly by researchers. It is made up of CPU, GPU, and SMP nodes that are interconnected by a 100Gbit low-latency network \cite{VVJW5lCpZRWyg8xc}. The hardware and software specifications of the cluster node that the benchmarks were run on can be found in Table~\ref{Table:benchmark-results-benchmark-platform-specifications}.
 
-\begin{table}[h!]
+\begin{table}[ht!]
 	\centering
 	\begin{tabular}{|l|l|}
 		\hline
@@ -35,7 +35,7 @@ The benchmark was run on the RCI (Research Center for Informatics in CTU Prague)
 The benchmarks for the implementations were run on a set of 63 matrices. The number of matrices used is comparatively smaller compared to the set of matrices used in the benchmarks of the author's bachelor thesis \textit{Formats for storage of sparse matrices on GPU} \cite{Cejka2020}. The lack of matrices in this benchmark is due to the fact that the current version of the \textit{Decomposition} project does not support decomposition of matrices that are not strongly regular, i.e. matrices that require a permutation matrix for a successful decomposition - described in Section~\ref{Section:theory-lu-decomposition}. This means that any matrices used in the benchmark had to be checked for the aforementioned requirement which made the selection process lengthy. Furthermore, since some dense matrices were included in the set, the drive space required was nearing the limit of what was feasible to move between servers and store in a compute node's scratch memory.
 \par The majority of matrices from the set used are sparse as they were obtained from the \emph{SuiteSparse Matrix Collection} \cite{Davis2011}. The remaining matrices are dense - they were randomly generated using the Python script shown in Listing~\ref{Listing:random-dense-matrix-generator} in Attachment~\ref{Attachment:random-dense-matrix-generator}. The dimensions of the matrices in the set ranged from $ 27 \times 27 $ to $ 10,793 \times 10,793 $ and, in general, their nonzero elements were mostly located along the main diagonal with some exceptions. For the direct comparison of results 14 matrices were selected from the set of 63. The chosen matrices were selected to represent a wide variety of characteristics: density/sparsity, nonzero element structure, and dimensions. The 14 selected matrices can be found in Table~\ref{Table:benchmark-results-matrices-used-for-benchmarks-14-selected-matrices}.
 
-\begin{table}[h!]
+\begin{table}[ht!]
 	\centering
 	\begin{tabular}{|>{\footnotesize}l|>{\raggedleft\arraybackslash\footnotesize}r|>{\raggedleft\arraybackslash\footnotesize}r|>{\raggedleft\arraybackslash\footnotesize}r|>{\raggedleft\arraybackslash\footnotesize}r|}
 		\hline
@@ -82,7 +82,7 @@ This section will present and analyze the benchmark results obtained from decomp
 \subsection{Bandwidth of the Implementations \TO}\label{Subsection:benchmark-results-bandwidth-of-the-implementations}
 The bandwidth of the decomposition implementations on the set of matrices using single and double precision is shown in Figure~\ref{Graph:benchmark-results-bandwidth-of-the-implementations-single-double-precision} - note that the graphs in the figure have a $ \log $-scaled vertical axis for clearer presentation of differences between the individual implementations.
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
 	\centering
 	\tikzset{mark options={mark size=2.0, line width=0.5pt},font=\small}
 	\begin{subfigure}{\textwidth}
@@ -147,7 +147,7 @@ The bandwidth of the decomposition implementations on the set of matrices using 
 
 Overall, no implementation outperformed the rest on all matrices. However, there seems to be a trend in ICM16 and ICM32 achieving a higher bandwidth on average for both single and double precision. The highest bandwidths achieved for single precision were 12.01 GByte/s by ICM16 and 11.92 GByte/s by ICM32 on the \textit{s1rmq4m1} matrix, and 10.70 GByte/s by ICM16 on the \textit{Na5} matrix. In terms of double precision the highest bandwidths achieved were 16.87 GByte/s by ICM32, 14.29 GByte/s by ICM16, and 11.38 GByte/s by ICM8 - all on the \textit{s1rmq4m1} matrix. Matrices \textit{s1rmq4m1} and \textit{Na5} are shown in Figure~\ref{Figure:benchmark-results-bandwidth-of-the-implementations-matrices-s1rmq4m1-na5}.
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
 	\centering
 	\begin{subfigure}{.5\textwidth}
 		\centering
@@ -171,7 +171,7 @@ Similarly, the \textit{Na5} matrix (Figure~\ref{Subfigure:benchmark-results-band
 \par ICM$ x $ achieved higher bandwidths on all sparse matrix with the exception of the \textit{bcsstk03} (Figure~\ref{Subfigure:benchmark-results-bandwidth-of-the-implementations-matrix-bcsstk03}) and \textit{rail\_5177} (Figure~\ref{Subfigure:benchmark-results-bandwidth-of-the-implementations-matrix-rail_5177}) matrices despite the former's nonzero element structure being favorable to ICM$ x $. As Table~\ref{Table:benchmark-results-matrices-used-for-benchmarks-14-selected-matrices} lists, the dimensions of the \textit{bcsstk03} matrix are $ 112\times 112 $ which is advantageous for the sequential implementation of CM, as there are fewer steps to perform. Furthermore, since the matrix was already present in host memory, CM's decomposition procedure began without delay. On the other hand, for ICM$ x $, the matrix first had to be copied to device memory and, additionally, the pre-kernel overhead subroutine of ICM$ x $ took - in this case - relatively valuable time to complete. This, combined with the fact that the strength of the iterative algorithm lies in the GPU's ability to process larger datasets, indicates that CM is more suitable for decomposing smaller matrices. \\
 When it comes to the \textit{rail\_5177} matrix (Figure~\ref{Subfigure:benchmark-results-bandwidth-of-the-implementations-matrix-rail_5177}), irrespective of the fact that its main diagonal is heavily populated with nonzero elements, there are other nonzero elements interspersed in a seemingly random fashion throughout the matrix. Therefore, similarly to dense matrices, the non-diagonal sections of this matrix also require more iterations to converge.
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
 	\centering
 	\begin{subfigure}{.5\textwidth}
 		\centering
@@ -201,7 +201,7 @@ The performance of ICM8 - as shown in Figure~\ref{Graph:benchmark-results-bandwi
 When comparing the differences in performance over all matrices between single and double precision for ICM16 and ICM32, the results seem consistent with the exception of certain dense matrices and the \textit{LeGresley\_2508} matrix (Figure~\ref{Figure:benchmark-results-bandwidth-of-the-implementations-matrix-legresley_2508}). When double precision is used, the performance of the mentioned implementations decreased drastically compared to single precision and compared to the decrease in performance of ICM8. Since $ 1/10 $ of the matrix dimensions are 250.8, \code{sectionSize} is set to \code{256} - the edge of the interval. Thus, \code{sectionSize} is the same for ICM8, ICM16, and ICM32 as their respective \code{BLOCK\_SIZE} is a divisor of \code{256}. Therefore, from the perspective of software, the only difference between the implementations in this instance - except for the precision - is the different \code{BLOCK\_SIZE}. It can be argued that ICM8 performed better due to the greater granularity of its thread blocks combined with the smaller size of the matrix. The greater granularity stems from the fact that ICM8 had 32 blocks assigned to each SM, whereas ICM16 had 8 and ICM32 had  2 - the A100 has a maximum of 2048 threads (64 warps; 32 blocks) per SM \cite{soj8qSRbfefUdi8Y}. This means that if the GPU would run out of resources in terms of concurrently active threads, then ICM8 would fair better as its smaller blocks could fill up the remaining resources more tightly (detailed in \textit{\nameref{Paragraph:CUDA-thread-management-grid}} in Section~\ref{Paragraph:CUDA-thread-management-grid}). This effect is only observed when decomposing smaller matrices which have a nonzero element structure similar to that of \textit{LeGresley\_2508}, i.e. matrices with nonzero elements on the main diagonal and nonzero elements interspersed elsewhere. Figure~\ref{Graph:benchmark-results-performance-of-implementations-across-all-matrices-bandwidth-double-precision} further confirms this suspicion for certain matrices where ICM8 outperforms ICM16 and ICM32 when double precision is used. For matrices with larger dimensions this effect would be mitigated since being able to utilize a few additional blocks would not amount to such a drastic difference in performance. Furthermore, the non-coalesced global memory access present for ICM8 (more so than ICM16) becomes apparent when decomposing larger matrices - especially when using single precision.
 \par Other than the notable bandwidth achieved on the \textit{bcsstk03} matrix, in general, the performance of CM was lower than that of ICM$ x $ - especially when single precision was used. Conversely, when double precision was used, its performance on dense matrices was comparable to that of ICM$ x $. Specifically, the bandwidth achieved for matrices \textit{Cejka2842}, \textit{Cejka5943}, \textit{Cejka7580}, and \textit{Cejka10793} by CM and ICM32 (best ICM$ x $ for the matrices mentioned) can be seen in Table~\ref{Table:benchmark-results-bandwidth-of-the-implementations-dense-matrices-bandwidth}.
 
-\begin{table}[h!]
+\begin{table}[ht!]
 	\centering
 	\renewcommand{\arraystretch}{1.5}
 	\begin{tabular}{ |c|c|c|c|c| } 
@@ -223,7 +223,7 @@ Since the algorithm used for CM is sequential and computes every element of the 
 \subsection{Speedup Comparison Between CM and different ICMs \TO}\label{Subsection:benchmark-results-speedup-comparison-between-CM-and-different-ICMs}
 As the bandwidth results shown in Figure~\ref{Graph:benchmark-results-bandwidth-of-the-implementations-single-double-precision} are presented with a $ \log $-scaled vertical axis, it can be difficult to see the performance differences between implementations. Therefore, to put the results into perspective, this section presents the speedup comparison between the implementations listed in Section~\ref{Section:benchmark-results-benchmarked-implementations}. Specifically, as mentioned in \textit{\nameref{Paragraph:implementation-decomposition-project-lu-decomposition-implementation-requirements}} in Section~\ref{Paragraph:implementation-decomposition-project-lu-decomposition-implementation-requirements} one of the goals of this project was to "\textit{measure the acceleration of the GPU version of the LU decomposition against the CPU version}". For that reason, speedup from the CM (host) implementation to the ICM$ x $ (device) implementations will be compared. The comparison - using single and double precision - on the set of matrices listed in Table~\ref{Table:benchmark-results-matrices-used-for-benchmarks-14-selected-matrices} is shown in Figure~\ref{Graph:benchmark-results-speedup-comparison-between-CM-and-different-ICMs-single-double-precision}.
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
 	\centering
 	\tikzset{mark options={mark size=2.0, line width=0.5pt},font=\small}
 	\begin{subfigure}{\textwidth}
@@ -291,7 +291,7 @@ As the bandwidth results shown in Figure~\ref{Graph:benchmark-results-bandwidth-
 
 \paragraph{ICM16 and ICM32} Similarly to the bandwidth results, overall, ICM16 and ICM32 were the best-performing implementations. For single precision, the three highest speedups compared to CM were 2,030.30 by ICM32 and 1,803.08 by ICM16 on the \textit{bundle1} matrix (Figure~\ref{Subfigure:benchmark-results-speedup-comparison-between-CM-and-different-ICMs-matrix-bundle1}), and 1,352.55 by ICM16 on the \textit{s1rmq4m1} matrix (Figure~\ref{Subfigure:benchmark-results-bandwidth-of-the-implementations-matrix-s1rmq4m1}). In terms of double precision, the highest speedups compared to CM were 1,337.53 and 1,137.98 achieved by ICM32 on matrices \textit{bundle1} and \textit{s1rmq4m1} respectively, and 1,022.01 achieved by ICM16 on the \textit{bundle1} matrix.
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
 	\centering
 	\begin{subfigure}{.5\textwidth}
 		\centering
@@ -312,7 +312,7 @@ As the bandwidth results shown in Figure~\ref{Graph:benchmark-results-bandwidth-
 Nevertheless, there are exceptions to the greater performance of ICM32. One such exception is the speedup compared to ICM8 on the \textit{s3rmt3m3} matrix (Figure~\ref{Subfigure:benchmark-results-speedup-comparison-between-CM-and-different-ICMs-matrix-s3rmt3m3}) when single precision is used. For this matrix, ICM32 achieved a speedup of 368.14, whereas ICM8 achieved 427.55. As can be seen from Figure~\ref{Subfigure:benchmark-results-speedup-comparison-between-CM-and-different-ICMs-matrix-s3rmt3m3} the nonzero element structure of the \textit{s3rmt3m3} matrix comprises of a strong concentration of nonzero elements along the main diagonal and six nonzero-element lines aimed away from the main diagonal. The reason mentioned for the higher performance on the \textit{Na5} matrix describes that a matrix with a similar nonzero element structure should not require many iterations to decompose for ICM$ x $ as the main diagonal has most of the nonzero elements and only a few other nonzero elements are found outside it. However, since the nonzero elements found outside the main diagonal are located much further from it than that of the \textit{Na5} matrix pictured in Figure~\ref{Subfigure:benchmark-results-bandwidth-of-the-implementations-matrix-na5}, then the non-diagonal sections needed more iterations to converge.
 \par Another noteworthy sparse matrix on which ICM$ x $ struggled - relative to the rest - was the \textit{fp} matrix (Figure~\ref{Figure:benchmark-results-speedup-comparison-between-CM-and-different-ICMs-matrix-fp}). It can be seen that the nonzero element structure is similar to that of the \textit{rail\_5177} matrix (Figure~\ref{Subfigure:benchmark-results-bandwidth-of-the-implementations-matrix-rail_5177}). In other words, nonzero elements are concentrated on the main diagonal and other nonzero elements are interspersed throughout the rest of the matrix. Consequently, the lack of performance by ICM$ x $ is due to more iterations required to converge the non-diagonal sections.
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
 	\centering
 	\includegraphics[width=.35\textwidth, keepaspectratio, clip]{images/ch3/matrices/fp.png}
 	\caption{Nonzero element pattern of the \mbox{\textit{fp}} matrix. Taken from the \emph{The university of Florida sparse matrix collection} \cite{Davis2011}.}
@@ -325,7 +325,7 @@ This means that non-coalesced access to global memory occurs for ICM8 and ICM16,
 In Figure~\ref{Graph:benchmark-results-speedup-comparison-between-CM-and-different-ICMs-single-double-precision} it can be seen that CM took more time to decompose most of the benchmarked matrices. However, an interesting result arises when comparing CM and ICM8 for double precision. Specifically, for 3 out of the 14 matrices, ICM8 was slower than CM as it achieved the following speedups: 0.09 for \textit{bcsstk03}, 0.92 for \textit{Cejka7580}, and 0.96 for \textit{Cejka10793}. While the result for \textit{bcsstk03} is not surprising given the matrix's dimensions, the others are. The most likely reason for the lower performance is the non-coalesced access to global memory which is most prominent for ICM8.
 \par Overall, the decomposition of matrices using single precision was faster compared to double precision. However, the difference in speed is not clearly visible from either Figure~\ref{Graph:benchmark-results-bandwidth-of-the-implementations-single-double-precision} (due to the vertical axis being $ \log $-scaled) or Figure~\ref{Graph:benchmark-results-speedup-comparison-between-CM-and-different-ICMs-single-double-precision} (due to the range of the speedup factor being too great for the values to be distinguishable). For this reason, the raw execution times for single and double precision are included in Table~\ref{Table:benchmark-results-speedup-comparison-between-CM-and-different-ICMs-execution-times-single-precision} and Table~\ref{Table:benchmark-results-speedup-comparison-between-CM-and-different-ICMs-execution-times-double-precision} respectively.
 
-\begin{table}[h!]
+\begin{table}[ht!]
 	\centering
 	\begin{tabular}{|>{\footnotesize}l|>{\raggedleft\arraybackslash\footnotesize}r|>{\raggedleft\arraybackslash\footnotesize}r|>{\raggedleft\arraybackslash\footnotesize}r|>{\raggedleft\arraybackslash\footnotesize}r|}
 		\hline
@@ -349,7 +349,7 @@ In Figure~\ref{Graph:benchmark-results-speedup-comparison-between-CM-and-differe
 	\label{Table:benchmark-results-speedup-comparison-between-CM-and-different-ICMs-execution-times-single-precision}
 \end{table}
 
-\begin{table}[h!]
+\begin{table}[ht!]
 	\centering
 	\begin{tabular}{|>{\footnotesize}l|>{\raggedleft\arraybackslash\footnotesize}r|>{\raggedleft\arraybackslash\footnotesize}r|>{\raggedleft\arraybackslash\footnotesize}r|>{\raggedleft\arraybackslash\footnotesize}r|}
 		\hline
@@ -382,7 +382,7 @@ This section shows the bandwidth, speedup comparison, and accuracy of results - 
 \par In terms of double precision the performance of ICM$ x $ is more consistent. The general rule of ICM8 performing worse than ICM16 and ICM32 for larger matrices still stands and the performance of ICM16 for matrices past matrix 30 is - in the majority of cases - less than that of ICM32. The dips in bandwidth of ICM$ x $ for matrices past matrix 25 are caused by the dense matrices found in the set. For the majority of matrices, the bandwidth achieved during their decomposition was greater than 1 GByte/s for both single and double precision. On the other hand, Figure~\ref{Graph:benchmark-results-performance-of-implementations-across-all-matrices-bandwidth-single-double-precision} shows that the bandwidth achieved by CM decreases in an almost logarithmic fashion with increasing matrix dimensions.
 \par Contrary to what the subset of results presented in Section~\ref{Subsection:benchmark-results-bandwidth-of-the-implementations} seemed to suggest, it can be seen from Figure~\ref{Graph:benchmark-results-performance-of-implementations-across-all-matrices-bandwidth-single-precision} (single precision) and Figure~\ref{Graph:benchmark-results-performance-of-implementations-across-all-matrices-bandwidth-double-precision} (double precision) that CM outperformed ICM$ x $ in more cases than just one. Although, it must be mentioned that the matrices on which CM achieved a higher bandwidth than ICM$ x $ did have dimensions between $ 27\times 27 $ and $ 415\times 415 $.
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
 	\centering
 	\tikzset{mark options={mark size=1.5},font=\small}
 	\begin{subfigure}{\textwidth}
@@ -444,7 +444,7 @@ This section shows the bandwidth, speedup comparison, and accuracy of results - 
 
 \paragraph{Speedup} The speedup comparison in Figure~\ref{Graph:benchmark-results-performance-of-implementations-across-all-matrices-speedup-single-double-precision} is presented for the sake of completeness and to show how much faster the ICM$ x $ implementations were compared to CM. Specifically, when single precision was used, all ICM$ x $ implementations were faster in 54/63 cases. In terms of double precision, ICM8 was faster in 51/63 cases, and ICM32 and ICM16 were faster in 53/63. However, as mentioned before, all of the matrices (with the two exceptions for ICM8 detailed in \textit{\nameref{Paragraph:benchmark-results-speedup-comparison-between-CM-and-different-ICMs-CM-speedup-description}} in Section~\ref{Paragraph:benchmark-results-speedup-comparison-between-CM-and-different-ICMs-CM-speedup-description}) that CM decomposed faster than ICM$ x $ have dimensions $ 415\times 415 $ or smaller.
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
 	\centering
 	\tikzset{mark options={mark size=1.5},font=\small}
 	\begin{subfigure}{\textwidth}
@@ -506,7 +506,7 @@ This section shows the bandwidth, speedup comparison, and accuracy of results - 
 
 Additionally, Table~\ref{Table:benchmark-results-performance-of-implementations-across-all-matrices-total-execution-time-single-double-precision} shows the total time required by each implementation to decompose the set of 63 matrices using both single and double precision. The data in this table provides further support to the claim made at the end of Section~\ref{Subsection:benchmark-results-speedup-comparison-between-CM-and-different-ICMs} which stated that ICM32 is the most suitable implementation for single and double precision.
 
-\begin{table}[h!]
+\begin{table}[ht!]
 	\centering
 	\renewcommand{\arraystretch}{1.5}
 	\begin{tabular}{|>{\footnotesize}l|>{\raggedleft\arraybackslash\footnotesize}r|>{\raggedleft\arraybackslash\footnotesize}r|>{\raggedleft\arraybackslash\footnotesize}r|>{\raggedleft\arraybackslash\footnotesize}r|}
@@ -528,7 +528,7 @@ Additionally, Table~\ref{Table:benchmark-results-performance-of-implementations-
 In other words, the matrix that results from multiplying the matrices obtained from the decomposition ($ \mathbb{L} $ and $ \mathbb{U} $) should - ideally - be the same as the input matrix ($ \mathbb{A} $). The values presented in this part are the largest differences between the actual results and the ideal results.
 \par For the purpose of this project, the maximum difference will also be referred to as the \textit{error}. Similarly to the previous figures, the vertical axis is $ \log $-scaled in order to present the results more clearly. This is due the fact that the data ranged from 268,435,500 to 0 for single precision and the median of the values for double precision was $ 2.32831\times10^{-10} $ with the data ranging from 2 to 0. The figure only shows data for ICM$ x $ as the accuracy of the results did not differ for the ICM$ x $ implementations.
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
 	\centering
 	\tikzset{mark options={mark size=1.5},font=\small}
 	\begin{subfigure}{\textwidth}
@@ -587,7 +587,7 @@ In other words, the matrix that results from multiplying the matrices obtained f
 Overall, it seems that the accuracy of results produced by both approaches (CM and ICM$ x $) is similar, nevertheless, values for both single and double precision will be analyzed.
 \subparagraph{Single precision} The statistical analysis of the accuracy of results for single precision is presented using a collection of basic statistical indexes in Table~\ref{Table:benchmark-results-performance-of-implementations-across-all-matrices-accuracy-statistical-indexes-single-precision}.
 
-\begin{table}[h!]
+\begin{table}[ht!]
 	\centering
 	\renewcommand{\arraystretch}{1.5}
 	\begin{tabular}{|>{\footnotesize}l|>{\raggedleft\arraybackslash\footnotesize}r|>{\raggedleft\arraybackslash\footnotesize}r|}
@@ -611,7 +611,7 @@ The values from the table present the problem of using single precision. Even th
 
 \subparagraph{Double precision} Similarly to single precision, the statistical analysis of the accuracy of results for double precision is presented using a collection of basic statistical indexes in Table~\ref{Table:benchmark-results-performance-of-implementations-across-all-matrices-accuracy-statistical-indexes-double-precision}.
 
-\begin{table}[h!]
+\begin{table}[ht!]
 	\centering
 	\renewcommand{\arraystretch}{1.5}
 	\begin{tabular}{|>{\footnotesize}l|>{\raggedleft\arraybackslash\footnotesize}r|>{\raggedleft\arraybackslash\footnotesize}r|}
@@ -637,7 +637,7 @@ Unlike the errors present for single precision, the results achieved using doubl
 \subsection{Comparison of Optimizations \TO}
 This section aims to show the evolution of the ICM$ x $ implementations throughout the development process. Since the benchmarks for each optimization were executed during the development process, they were run on a different platform than the results presented in Sections~\ref{Subsection:benchmark-results-bandwidth-of-the-implementations}, \ref{Subsection:benchmark-results-speedup-comparison-between-CM-and-different-ICMs}, and \ref{Subsection:benchmark-results-performance-of-implementations-across-all-matrices}. The platform used during development was one of the compute servers available to students and staff of the Faculty of Nuclear Sciences and Physical Engineering of the Czech Technical University in Prague. The specifications of the GP7 platform are listed in Table~\ref{Table:benchmark-results-comparison-of-optimizations}.
 
-\begin{table}[h!]
+\begin{table}[ht!]
 	\centering
 	\begin{tabular}{|l|l|}
 		\hline
@@ -676,7 +676,7 @@ Note that the \textit{Base}, \textit{SM}, and \textit{SM opt.} optimizations all
 
 \paragraph{Execution times} The results will be presented only for double precision and for \code{BLOCK\_SIZE} set to 32. The reason behind this is that the results are shown in order to detail the evolution of the implementation, rather than compare differences in thread-per-block configurations. The execution times for the decomposition of the set of 50 matrices for the optimizations listed above are shown in Figure~\ref{Graph:benchmark-results-comparison-of-optimizations-execution-times-50-matrices-double-precision} (vertical axis is $ \log $-scaled for clarity) and the total time taken for each optimization to decompose the set of 50 matrices is shown in Table~\ref{Table:benchmark-results-comparison-of-optimizations-total-execution-time}.
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
 	\centering
 	\tikzset{mark options={mark size=1.5},font=\small}
 	\begin{tikzpicture}
@@ -710,7 +710,7 @@ Note that the \textit{Base}, \textit{SM}, and \textit{SM opt.} optimizations all
 
 As can be seen from Figure~\ref{Graph:benchmark-results-comparison-of-optimizations-execution-times-50-matrices-double-precision} the \textit{Base} optimization (orange line) is found at the top of the other optimizations for majority of matrices, which indicates that it took the most time to decompose each individual matrix. This fact is further supported by the total time taken by \textit{Base} to decompose the entire set of 50 matrices, which is shown in Table~\ref{Table:benchmark-results-comparison-of-optimizations-total-execution-time}. According to the graph, it would seem that the \textit{SM} and \textit{SM opt.} optimizations achieved similar times, however, as can be seen in Table~\ref{Table:benchmark-results-comparison-of-optimizations-total-execution-time}, they were almost 3 and 4 times faster, respectively, than \textit{Base}.
 
-\begin{table}[h!]
+\begin{table}[ht!]
 	\centering
 	\renewcommand{\arraystretch}{1.5}
 	\begin{tabular}{ |c|c|c|c|c|c|c|c| } 
@@ -729,7 +729,7 @@ It can be seen that the total execution time for \textit{ConvRow005} was $ 57.79
 
 \paragraph{Accuracy} In terms of accuracy, Table~\ref{Table:benchmark-results-comparison-of-optimizations-accuracy-statistical-indexes-double-precision} shows that \textit{ConvRow0} achieved the most accurate decomposition results with an average error of 0.0397 and standard deviation of 0.1752. This is due to the fact that the optimization decomposed the input matrix by converging by sections comprised of 512 rows. This means that if the tolerance value $ tol $ was set to zero, then the optimization would perform many iterations before converging. However, this gain in accuracy reflected on the relatively poor performance - shown in Table~\ref{Table:benchmark-results-comparison-of-optimizations-total-execution-time}. Specifically, \textit{ConvRow0} required 143.68 seconds to decompose all 50 matrices.
 
-\begin{table}[h!]
+\begin{table}[ht!]
 	\centering
 	\renewcommand{\arraystretch}{1.5}
 	\begin{tabular}{|>{\footnotesize}l|>{\raggedleft\arraybackslash\footnotesize}r|>{\raggedleft\arraybackslash\footnotesize}r|>{\raggedleft\arraybackslash\footnotesize}r|>{\raggedleft\arraybackslash\footnotesize}r|}
