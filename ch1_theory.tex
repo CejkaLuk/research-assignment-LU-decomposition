@@ -57,15 +57,15 @@ Nvidia GPUs, on the other hand, are engineered to have many smaller controlling 
 		\hline
 		FP32 Cores / SM & NA &NA & 64 & 64 \\
 		\hline
-		FP32 Cores / GPU & NA & NA & 5120 & 6912 \\
+		FP32 Cores / GPU & NA & NA & 5,120 & 6,912 \\
 		\hline
 		FP64 Cores / SM & NA & NA & 32 & \\
 		\hline
-		FP64 Cores / GPU (excl. Tensor)	& NA & NA & 2560 & 3456 \\
+		FP64 Cores / GPU (excl. Tensor)	& NA & NA & 2,560 & 3,456 \\
 		\hline
 		CUDA Cores / SM & 128 & 128 & NA & NA \\
 		\hline
-		CUDA Cores / GPU & 1920 & 3584 & NA & NA \\
+		CUDA Cores / GPU & 1,920 & 3,584 & NA & NA \\
 		\hline
 		Tensor Cores / SM & NA & 4 & 8 & 16 \\
 		\hline
@@ -921,7 +921,7 @@ Unlike the previous example, the code shown in Listing~\ref{Listing:CUDA-matrix-
 This solution ensures correct results and avoids a case of thread divergence in the main loop which would occur multiple times during the computation. However, the thread divergence will still occur when deciding which value to load from global memory and when terminating the kernel for some threads. Nevertheless, similarly to the previous approach, in this instance thread divergence will not have a large impact on overall performance as one of the execution paths would be a simple assignment operation in the first condition and a \code{return} statement in the second condition.
 
 \subsubsection{Comparison of Both Examples}\label{Subsubsection:matrix-multiplication-comparison-of-examples}
-In order to show the performance difference, benchmarks for both examples using single precision were run on a set of matrices with varying dimensions - from 160 by 160 to 16000 by 16000. The hardware and software specifications of the machine used for the benchmarks can be found in Table~\ref{Table:CUDA-matrix-multiplication-benchmark-system}. Furthermore, the full code can be found in Attachment~\ref{Attachment:CUDA-matrix-multiplication-code}.
+In order to show the performance difference, benchmarks for both examples using single precision were run on a set of matrices with varying dimensions - from 160 by 160 to 16,000 by 16,000. The hardware and software specifications of the machine used for the benchmarks can be found in Table~\ref{Table:CUDA-matrix-multiplication-benchmark-system}. Furthermore, the full code can be found in Attachment~\ref{Attachment:CUDA-matrix-multiplication-code}.
 
 \begin{table}[h]
 	\centering
@@ -962,7 +962,7 @@ In other words, allocation and copying of the matrices was not included in the m
 			,xtick pos=left
 			,ytick={0,100,200,300,400,500,600,700,800}
 			,ytick pos=left
-			,xticklabels={160x160,800 x 800,1600 x 1600,8000 x 8000,16000 x 16000}
+			,xticklabels={160x160,800 x 800,{1,600 x 1,600},{8,000 x 8,000},{16,000 x 16,000}}
 			,x tick label style={rotate=45,anchor=east,yshift=-6pt,align=right,font=\normalsize}
 			,y tick label style={font=\normalsize}
 			,ymajorgrids
@@ -1004,18 +1004,18 @@ In other words, allocation and copying of the matrices was not included in the m
 		\hline
 		800 x 800 & 3.509 & 1.408 \\
 		\hline
-		1600 x 1600 & 26.224 & 11.613 \\
+		1,600 x 1,600 & 26.224 & 11.613 \\
 		\hline
-		8000 x 8000 & 5846.247 & 1435.221 \\
+		8,000 x 8,000 & 5,846.247 & 1,435.221 \\
 		\hline
-		16000 x 16000 & 52226.867 & 12910.967 \\
+		16,000 x 16,000 & 52,226.867 & 12,910.967 \\
 		\hline
 	\end{tabular}
 	\caption{Matrix multiplication execution times (in milliseconds) of matrices with varying dimensions; matrices are filled with 1 element. The values are averages from 10 loops of the operation.}
 	\label{Table:CUDA-matrix-multiplication-benchmark-results-msec}
 \end{table}
 
-As can be seen in Figure~\ref{Figure:CUDA-matrix-multiplication-benchmark-results-flops} and Table~\ref{Table:CUDA-matrix-multiplication-benchmark-results-msec}, the approach that utilizes shared memory achieved between 2-4 times the number of GFLOPs per second and similarly faster execution times compared to the approach that does not use shared memory and instead relies only on global memory. Additionally, the difference seems to be increasing with growing matrix dimensions, however, this statement has not been verified for dimensions greater than 16000 by 16000.
+As can be seen in Figure~\ref{Figure:CUDA-matrix-multiplication-benchmark-results-flops} and Table~\ref{Table:CUDA-matrix-multiplication-benchmark-results-msec}, the approach that utilizes shared memory achieved between 2-4 times the number of GFLOPs per second and similarly faster execution times compared to the approach that does not use shared memory and instead relies only on global memory. Additionally, the difference seems to be increasing with growing matrix dimensions, however, this statement has not been verified for dimensions greater than 16,000 by 16,000.
 
 
 

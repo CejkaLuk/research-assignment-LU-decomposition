@@ -289,7 +289,7 @@ As the bandwidth results shown in Figure~\ref{Graph:benchmark-results-bandwidth-
 	\label{Graph:benchmark-results-speedup-comparison-between-CM-and-different-ICMs-single-double-precision}
 \end{figure}
 
-\paragraph{ICM16 and ICM32} Similarly to the bandwidth results, overall, ICM16 and ICM32 were the best-performing implementations. For single precision, the three highest speedups compared to CM were 2030.30 by ICM32 and 1803.08 by ICM16 on the \textit{bundle1} matrix (Figure~\ref{Subfigure:benchmark-results-speedup-comparison-between-CM-and-different-ICMs-matrix-bundle1}), and 1352.55 by ICM16 on the \textit{s1rmq4m1} matrix (Figure~\ref{Subfigure:benchmark-results-bandwidth-of-the-implementations-matrix-s1rmq4m1}). In terms of double precision, the highest speedups compared to CM were 1337.53 and 1137.98 achieved by ICM32 on matrices \textit{bundle1} and \textit{s1rmq4m1} respectively, and 1022.01 achieved by ICM16 on the \textit{bundle1} matrix.
+\paragraph{ICM16 and ICM32} Similarly to the bandwidth results, overall, ICM16 and ICM32 were the best-performing implementations. For single precision, the three highest speedups compared to CM were 2,030.30 by ICM32 and 1,803.08 by ICM16 on the \textit{bundle1} matrix (Figure~\ref{Subfigure:benchmark-results-speedup-comparison-between-CM-and-different-ICMs-matrix-bundle1}), and 1,352.55 by ICM16 on the \textit{s1rmq4m1} matrix (Figure~\ref{Subfigure:benchmark-results-bandwidth-of-the-implementations-matrix-s1rmq4m1}). In terms of double precision, the highest speedups compared to CM were 1,337.53 and 1,137.98 achieved by ICM32 on matrices \textit{bundle1} and \textit{s1rmq4m1} respectively, and 1,022.01 achieved by ICM16 on the \textit{bundle1} matrix.
 
 \begin{figure}[h!]
 	\centering
@@ -512,8 +512,8 @@ Additionally, Table~\ref{Table:benchmark-results-performance-of-implementations-
 	\begin{tabular}{|>{\footnotesize}l|>{\raggedleft\arraybackslash\footnotesize}r|>{\raggedleft\arraybackslash\footnotesize}r|>{\raggedleft\arraybackslash\footnotesize}r|>{\raggedleft\arraybackslash\footnotesize}r|}
 		\hline
 		\multicolumn{1}{|>{\centering\footnotesize}c|}{Matrix} & \multicolumn{1}{>{\centering\footnotesize}c|}{CM} & \multicolumn{1}{>{\centering\footnotesize}c|}{ICM8} & \multicolumn{1}{>{\centering\footnotesize}c|}{ICM16} & \multicolumn{1}{>{\centering\footnotesize}c|}{ICM32} \\ \hline
-		Single        & 2393.09 &   35.88 &  17.36 & \cellcolor{green!25} 13.84 \\
-		Double 		  & 2635.45 & 1000.27 & 772.29 & \cellcolor{green!25}592.19 \\ \hline
+		Single        & 2,393.09 &    35.88 &  17.36 & \cellcolor{green!25} 13.84 \\
+		Double 		  & 2,635.45 & 1,000.27 & 772.29 & \cellcolor{green!25}592.19 \\ \hline
 	\end{tabular}
 	\caption{The total execution time (in seconds) taken by each implementation to decompose the set of 63 matrices (Table~\ref{Table:benchmark-results-matrices-used-for-benchmarks-14-selected-matrices}) on the RCI compute cluster specified in Table~\ref{Table:benchmark-results-benchmark-platform-specifications} using single and double precision. The fastest time for each precision is highlighted in green.}
 	\label{Table:benchmark-results-performance-of-implementations-across-all-matrices-total-execution-time-single-double-precision}
@@ -717,7 +717,7 @@ As can be seen from Figure~\ref{Graph:benchmark-results-comparison-of-optimizati
 		\hline
 		Optimization & Base    & SM     & SM opt. & ConvRow005 & ConvRow0 & ParSecGPU & ICM32 \\
 		\hline
-		Time [s]     & 2140.83 & 745.15 & 514.91  & 57.79      & 143.68   &  89.91    & 43.88 \\
+		Time [s]     & 2,140.83 & 745.15 & 514.91  & 57.79      & 143.68   &  89.91    & 43.88 \\
 		\hline
 	\end{tabular}
 	\caption{The total execution time (in seconds) taken by each optimization to decompose the set of 50 matrices.}
