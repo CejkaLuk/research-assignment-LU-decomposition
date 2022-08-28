@@ -1158,7 +1158,56 @@ The Crout matrix decomposition algorithm is based on sequentially computing matr
 	i,j &\in \widehat{n} \nonumber\,.
 \end{align}
 
-Specifically, the algorithm first computes a column $ j $ in $ \mathbb{L} $ and then row $ j $ in $ \mathbb{U} $. This process repeats itself for $ j $ from 1 to $ n $. The pseudocode implementing the algorithm can be seen in Listing~\ref{Listing:theory-LU-decomposition-crout-method-pseudocode} and the visualization of the algorithm's advance is shown in Figure~\ref{Figure:theory-LU-decomposition-crout-method-visualisation}.
+Specifically, the algorithm first computes a column $ j $ in $ \mathbb{L} $ and then row $ j $ in $ \mathbb{U} $. This process repeats itself for $ j $ from 1 to $ n $. The visualization of the algorithm's advance is shown in Figure~\ref{Figure:theory-LU-decomposition-crout-method-visualisation} and the pseudocode implementing the algorithm can be seen in Listing~\ref{Listing:theory-LU-decomposition-crout-method-pseudocode}.
+
+\begin{figure}[ht!]
+	\centering
+	\begin{tikzpicture}
+		[
+		,node distance = 0pt
+		,square/.style = { 	
+			,draw=black
+			,minimum height=0.85cm
+			,minimum width=1.2cm
+			,inner sep=0pt
+			,line width=1pt}
+		,text_label/.style = {
+			,font=\bfseries}
+		]
+		
+		% Row of nodes
+		\node (jj)   [square,  				 				node contents={$ l_{jj} $}];
+		\node (jj1)  [square, right=-\pgflinewidth of jj,   node contents={$ u_{j,\left(j+1\right)} $}];
+		\node (jj2)  [square, right=-\pgflinewidth of jj1,  node contents={$ u_{j,\left(j+2\right)} $}];
+		\node (jdot) [square, right=-\pgflinewidth of jj2,  node contents={$ \cdots $}];
+		\node (jn1)  [square, right=-\pgflinewidth of jdot, node contents={$ u_{j,\left(n-1\right)} $}];
+		\node (jn)   [square, right=-\pgflinewidth of jn1,  node contents={$ u_{jn} $}];
+		
+		% Column of nodes
+		\node (j1j)  [square, below=-\pgflinewidth of jj,   node contents={$ l_{\left(j+1\right),j} $}];
+		\node (j2j)  [square, below=-\pgflinewidth of j1j,  node contents={$ l_{\left(j+2\right),j} $}];
+		\node (dotj) [square, below=-\pgflinewidth of j2j,  node contents={$ \vdots $}];
+		\node (n1j)  [square, below=-\pgflinewidth of dotj, node contents={$ l_{\left(n-1\right),j} $}];
+		\node (nj)   [square, below=-\pgflinewidth of n1j,  node contents={$ l_{nj} $}];
+		
+		% Diagonal arrow
+		\node[draw, single arrow
+		,inner sep=0.75mm
+		,minimum height=30mm
+		,single arrow head extend=2mm
+		,below right=20mm of {$(j1j.east)!0.5!(jj1.south)$}
+		,rotate=-45
+		,line width=1pt] {};
+		
+		% Labels		
+		\node[text_label, above=5mm of {$(jj2.north west)!0.5!(jdot.north east)$}] 			 {Prior Iterations};
+		\node[text_label, left=9mm of {$(dotj.south west)!1.4!(j2j.north west)$}, rotate=90] {Prior Iterations};
+		\node[text_label, below=3mm of nj] 													 {Iteration $ j $};
+		\node[text_label, right=33mm of nj, align=center] 									 {Subsequent\\Iterations};
+	\end{tikzpicture}
+	\caption{Sequence of computations of the Crout method. First, column $ j $ in $ \mathbb{L} $ is computed and then row $ j $ of $ \mathbb{U} $. Taken from Vismor's \emph{Crout's LU Factorization} \cite{rqjYYJkSwERYYbSy}.}
+	\label{Figure:theory-LU-decomposition-crout-method-visualisation}
+\end{figure}
 
 \begin{lstlisting}[caption={C++ pseudocode implementing Crout's matrix decomposition algorithm. It assumes that \code{A[n][n]} is a two-dimensional array that represents the invertible square coefficient matrix $ \mathbb{A} $; \code{L[n][n]} and \code{U[n][n]} are also two-dimensional arrays reprenting matrices $ \mathbb{L} $ and $ \mathbb{U} $ respectively. Furthermore, it is assumed that \code{L} and \code{U} are populated with zeros. Derived from \emph{Crout's LU Factorization} \cite{rqjYYJkSwERYYbSy}, \emph{Numerical recipes: the art of scientific computing} \cite{Press2007} and \emph{Crout matrix decomposition} \cite{TgtpOw7zCHo3ii0m}.},label={Listing:theory-LU-decomposition-crout-method-pseudocode}]
 void crout_method( A, L, U )
@@ -1202,12 +1251,6 @@ void crout_method( A, L, U )
 }
 \end{lstlisting}
 
-\begin{figure}[ht!]
-	\centering
-	\includegraphics[width=0.8\textwidth, keepaspectratio]{images/ch1/LU_decomposition_crout_method_visualization.png}
-	\caption{Sequence of computations of the Crout method. First, column $ j $ in $ \mathbb{L} $ is computed and then row $ j $ of $ \mathbb{U} $. Taken from Vismor's \emph{Crout's LU Factorization} \cite{rqjYYJkSwERYYbSy}.}
-	\label{Figure:theory-LU-decomposition-crout-method-visualisation}
-\end{figure}
 
 \subsection{Numerical Method}\label{Subsection:theory-LU-decomposition-numerical-method}
 When solving systems of linear equations there are two main groups of methods:
