@@ -1,7 +1,7 @@
-\chapter{Comparing Decomposition Implementations \TO}\label{Chapter:comparing-decomposition-implementations}
+\chapter{Comparing Decomposition Implementations}\label{Chapter:comparing-decomposition-implementations}
 In Section~\ref{Subsection:implementation-decomposition-project-benchmark} the benchmark structure implemented in order to compare the performance of the GPU version of the LU decomposition and the CPU version was presented. This chapter will present and analyze the results of the benchmark that was run in order to compare the aforementioned implementations. To begin with, the benchmarked implementations will be briefly summarized along with the specifications of the platform that the benchmarks were run on. Then, the set of matrices used in the benchmarks will be listed. Finally, the results of the benchmark will be presented and analyzed.
 
-\section{Benchmarked Implementations \TO}\label{Section:comparing-decomposition-implementations-benchmarked-implementations}
+\section{Benchmarked Implementations}\label{Section:comparing-decomposition-implementations-benchmarked-implementations}
 The implementations in the \textit{Decomposition} project that were benchmarked are the following:
 
 \begin{itemize}
@@ -11,7 +11,7 @@ The implementations in the \textit{Decomposition} project that were benchmarked 
 
 
 
-\section{Benchmark Platform Specifications \TO}\label{Section:comparing-decomposition-implementations-benchmark-platform-specifications}
+\section{Benchmark Platform Specifications}\label{Section:comparing-decomposition-implementations-benchmark-platform-specifications}
 The benchmark was run on the RCI (Research Center for Informatics in CTU Prague) Cluster\footnote{RCI homepage URL: \url{http://rci.cvut.cz/}} which is a HPC (High Performance Computing) infrastructure made up of CPU, GPU, and SMP nodes \cite{VVJW5lCpZRWyg8xc}. The hardware and software specifications of the cluster node that the benchmarks were run on can be found in Table~\ref{Table:comparing-decomposition-implementations-benchmark-platform-specifications}.
 
 \begin{table}[ht!]
@@ -31,7 +31,7 @@ The benchmark was run on the RCI (Research Center for Informatics in CTU Prague)
 
 
 
-\section{Matrices Used for Benchmarks \TO}
+\section{Matrices Used for Benchmarks}
 The benchmarks for the implementations were run on a set of 63 matrices. The smaller number of matrices used for this benchmark is due to the fact that the current version of the \textit{Decomposition} project does not support decomposition of matrices that are not strongly regular, i.e. matrices that require a permutation matrix for a successful decomposition - described in Section~\ref{Section:theory-LU-decomposition}. This means that any matrices used in the benchmark had to be checked for the aforementioned requirement which made the selection process lengthy.
 \par The majority of matrices from the set used are sparse (obtained from the \emph{SuiteSparse Matrix Collection} \cite{Davis2011}). The remaining matrices are dense (randomly generated using the Python script shown in Listing~\ref{Listing:random-dense-matrix-generator} in Attachment~\ref{Attachment:random-dense-matrix-generator}). The dimensions of the matrices in the set ranged from $ 27 \times 27 $ to $ 10,793 \times 10,793 $ and, in general, their nonzero elements were mostly located along the main diagonal with some exceptions. For the direct comparison of results 14 matrices were selected from the set of 63. The chosen matrices were selected to represent a wide variety of characteristics: density/sparsity, nonzero element structure, and dimensions. The 14 selected matrices can be found in Table~\ref{Table:comparing-decomposition-implementations-matrices-used-for-benchmarks-14-selected-matrices}.
 
@@ -61,11 +61,11 @@ The benchmarks for the implementations were run on a set of 63 matrices. The sma
 
 
 
-\section{Benchmark Results \TO}\label{Section:comparing-decomposition-implementations-benchmark-results}
+\section{Benchmark Results}\label{Section:comparing-decomposition-implementations-benchmark-results}
 This section will present and analyze the benchmark results obtained from decomposing the matrices shown in Table~\ref{Table:comparing-decomposition-implementations-matrices-used-for-benchmarks-14-selected-matrices} using the implementations mentioned in Section~\ref{Section:comparing-decomposition-implementations-benchmarked-implementations} on the platform described in Section~\ref{Section:comparing-decomposition-implementations-benchmark-platform-specifications}. The benchmark subroutine described in Section~\ref{Subsection:implementation-decomposition-project-benchmark} assumed that each matrix is decomposed once, however, in this benchmark run, in order to minimize anomalous behaviors and assure the quality of presented results, each matrix was decomposed 100 times. Then, the data collected across all 100 runs (execution time, speedup, etc.) was averaged and subsequently logged. First, the comparison of speedup between CM and ICM$ x $ will be detailed for both single and double precision. Then, the speedup comparison across the entire set of 63 matrices will be briefly shown, along with the accuracy of results for all matrices. Finally, the benchmark results measured during development for the optimizations described in Section~\ref{Section:implementation-optimization} will be shown. Full benchmarks results - including logs - are available upon request.
 \par Note that the term \textit{time}, or \textit{execution time}, represents the execution time of the entire \code{CroutMethodIterative::decompose()} method. In other words, not only the execution time of the kernel, but also the setup of the computation and copying the required data from the host to device.
 
-\subsection{Speedup Comparison Between CM and different ICMs \TO}\label{Subsection:comparing-decomposition-implementations-speedup-comparison-between-CM-and-different-ICMs}
+\subsection{Speedup Comparison Between CM and different ICMs}\label{Subsection:comparing-decomposition-implementations-speedup-comparison-between-CM-and-different-ICMs}
 As mentioned in \textit{\nameref{Paragraph:implementation-decomposition-project-lu-decomposition-implementation-requirements}} in Section~\ref{Paragraph:implementation-decomposition-project-lu-decomposition-implementation-requirements} one of the goals of this project was to "\textit{measure the acceleration of the GPU version of the LU decomposition against the CPU version}". For that reason, speedup from the CM (host) implementation to the ICM$ x $ (device) implementations will be compared. The comparison - using single and double precision - on the set of matrices listed in Table~\ref{Table:comparing-decomposition-implementations-matrices-used-for-benchmarks-14-selected-matrices} is shown in Figure~\ref{Graph:comparing-decomposition-implementations-speedup-comparison-between-CM-and-different-ICMs-single-double-precision} - note that the graphs in the figure have a $ \log $-scaled vertical axis for clearer presentation of differences between the individual implementations.
 
 \begin{figure}[ht!]
@@ -296,7 +296,7 @@ Nevertheless, since the algorithm used for CM is sequential and computes every e
 
 From the results presented in Table~\ref{Table:comparing-decomposition-implementations-speedup-comparison-between-CM-and-different-ICMs-execution-times-single-precision} it can be concluded that ICM32 is the most suitable implementation for decomposing matrices using single precision. In terms of double precision the same statement could be made when looking at Table~\ref{Table:comparing-decomposition-implementations-speedup-comparison-between-CM-and-different-ICMs-execution-times-double-precision}. However, since the results presented in the mentioned tables were only a small subset of all results, verification of this claim is required for the entire set of 63 matrices.
 
-\subsection{Performance of Implementations Across All Matrices \TO}\label{Subsection:comparing-decomposition-implementations-performance-of-implementations-across-all-matrices}
+\subsection{Performance of Implementations Across All Matrices}\label{Subsection:comparing-decomposition-implementations-performance-of-implementations-across-all-matrices}
 This section shows the speedup comparison and accuracy of results using both single and double precision for the decomposition implementations listed in Section~\ref{Section:comparing-decomposition-implementations-benchmarked-implementations} across the entire set of 63 matrices. The benchmarks were run on the platform specified in Table~\ref{Table:comparing-decomposition-implementations-benchmark-platform-specifications}. In order to illustrate how ICM$ x $ compares to CM on matrices that increase in size, the matrices in the graphs were sorted from smallest to largest. The speedup comparison between CM and ICM$ x $ can be found in Figure~\ref{Graph:comparing-decomposition-implementations-performance-of-implementations-across-all-matrices-speedup-single-double-precision} and the accuracy of the results can be found in Figure~\ref{Graph:comparing-decomposition-implementations-performance-of-implementations-across-all-matrices-accuracy-single-double-precision}. All graphs in this section have a $ \log $-scaled vertical axis as the range of values was too great to present any coherent data.
 
 \paragraph{Speedup} As shown in Figure~\ref{Graph:comparing-decomposition-implementations-performance-of-implementations-across-all-matrices-speedup-single-double-precision}, in terms of speedup compared to CM, the ICM$ x $ implementations achieved similar results.
@@ -443,7 +443,7 @@ In other words, the matrix that results from multiplying the matrices obtained f
 		\subcaption{Double precision}
 		\label{Graph:comparing-decomposition-implementations-performance-of-implementations-across-all-matrices-accuracy-double-precision}
 	\end{subfigure}
-	\caption{The accuracy of results achieved by CM and ICM$ x $ implementations on the entire set of 63 matrices using both single and double precision. In this instance "\textit{accuracy}" refers to the maximum difference of $ \left| \mathbb{A} - \mathbb{L}\mathbb{U} \right| $ where $ \mathbb{A} $ is the input matrix and $ \mathbb{L} $ and $ \mathbb{U} $ are the matrices obtained from the decomposition procedure. The higher the maximum difference, the lower the accuracy of the results (the higher the error). Matrix ID signifies the ID of the matrices, after they have been sorted according to their dimension from smallest to largest. The vertical axis is $ \log $-scaled for better visibility of differences between implementations. Note that the vertical axes of both graphs do not cover the same range.}
+	\caption{The accuracy of results achieved by CM and ICM$ x $ implementations on the entire set of 63 matrices using both single and double precision. In this instance, the term "accuracy" refers to the maximum difference of $ \left| \mathbb{A} - \mathbb{L}\mathbb{U} \right| $ where $ \mathbb{A} $ is the input matrix and $ \mathbb{L} $ and $ \mathbb{U} $ are the matrices obtained from the decomposition procedure. The higher the maximum difference, the lower the accuracy of the results (the higher the error). Matrix ID signifies the ID of the matrices, after they have been sorted according to their dimension from smallest to largest. The vertical axis is $ \log $-scaled for better visibility of differences between implementations. Note that the vertical axes of both graphs do not cover the same range.}
 	\label{Graph:comparing-decomposition-implementations-performance-of-implementations-across-all-matrices-accuracy-single-double-precision}
 \end{figure}
 
@@ -497,7 +497,7 @@ Unlike the accuracy of results for single precision, the results achieved using 
 \par Ultimately, it can be concluded that CM is the format that produces more accurate matrices when using double precision. However, the performance of CM remains to be multitudes lower than that of ICM$ x $. Further benchmarks on real-life problems are required to determine whether the errors achieved by ICM$ x $ are too severe, or if the speedup compared to CM is worth the slightly more inaccurate results.
 
 
-\subsection{Comparison of Optimizations \TO}
+\subsection{Comparison of Optimizations}
 This section aims to show the evolution of the ICM$ x $ implementations throughout the development process. Since the benchmarks for each optimization were executed during the development process, they were run on a different platform than the results presented in Sections~\ref{Subsection:comparing-decomposition-implementations-speedup-comparison-between-CM-and-different-ICMs} and \ref{Subsection:comparing-decomposition-implementations-performance-of-implementations-across-all-matrices}. The platform used during development was the GP7 compute server (specifications listed in Table~\ref{Table:comparing-decomposition-implementations-comparison-of-optimizations}) which is located in the Faculty of Nuclear Sciences and Physical Engineering of the Czech Technical University in Prague.
 
 \begin{table}[ht!]
