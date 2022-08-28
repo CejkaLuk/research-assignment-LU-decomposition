@@ -1,5 +1,5 @@
 \chapter{Implementation \TO}\label{Chapter:implementation-introduction}
-This chapter will present the implementation of the \textit{Decomposition} project that was built around the algorithms described in Sections~\ref{Subsection:theory-LU-decomposition-crout-method} and \ref{Subsection:theory-LU-decomposition-numerical-method}. First, the \textit{TNL} library\footnote{TNL Library GitLab repository URL: \url{https://gitlab.com/tnl-project/tnl}} will be introduced briefly as it contains a structure that was paramount to the implementation of this project. Then, the description of the \textit{Decomposition} project itself will follow. Finally, the last section will present how the iterative algorithm, mentioned in Section~\ref{Subsection:theory-LU-decomposition-numerical-method}, was fine-tuned for optimal performance using CUDA.
+This chapter will present the implementation of the \textit{Decomposition} project that was built around the algorithms described in Sections~\ref{Subsection:theory-LU-decomposition-crout-method} and \ref{Subsection:theory-LU-decomposition-numerical-method}. First, the \textit{TNL} library\footnote{TNL library GitLab repository URL: \url{https://gitlab.com/tnl-project/tnl}} will be introduced briefly as it contains a structure that was paramount to the implementation of this project. Then, the description of the \textit{Decomposition} project itself will follow. Finally, the last section will present how the iterative algorithm, mentioned in Section~\ref{Subsection:theory-LU-decomposition-numerical-method}, was fine-tuned for optimal performance using CUDA.
 
 \section{TNL Library \TO}\label{Section:implementation-tnl-library}
 The Template Numerical Library (TNL) is a collaborative, open-source project licensed under the MIT license. It aims to use modern programming paradigms combined with the computational power of parallel architectures to provide highly performant numerical solvers and simulations. In terms of parallel architectures, TNL supports both multi-core CPUs (using OpenMP\footnote{OpenMP website URL: \url{https://www.openmp.org/}}) and GPUs (as of July 2022 only CUDA-enabled Nvidia GPUs with compute capability 9.0 or higher \cite{Ednu6dyrkWKz1Bv2}). As TNL is written in C++ (with the exception of some helping Python/Bash scripts) it is designed to benefit from C++ templates and the advantages they bring. For example, the use of template specializations allows for minimal overhead runtime which makes execution of architecture-dependent code simple and fast \cite{Oberhuber20210210}. Further up-to-date information regarding TNL can be found on the project's website\footnote{TNL project website URL: \url{https://tnl-project.org/}}. \\
@@ -76,116 +76,28 @@ More detailed information on the structure's implementation can be found under \
 
 
 \section{Decomposition Project \TO}\label{Section:implementation-decomposition-project}
-Even though the \code{DenseMatrix} class from TNL is used in the Decomposition project - and a select few solvers are already implemented in TNL - it was decided to create a separate repository\footnote{\label{Footnote:decomposition-project-gitlab-url}Decomposition GitLab repository URL: \url{https://mmg-gitlab.fjfi.cvut.cz/gitlab/tnl/lu-decomposition}} in GitLab solely for this rendition of decomposition. Since the project is continually under development it is only available internally,
+This section aims to present the project that contains the implementations of the algorithms mentioned in Sections~\ref{Subsection:theory-LU-decomposition-crout-method} and \ref{Subsection:theory-LU-decomposition-numerical-method}. The project can be found in the \textit{Decomposition} repository on GitLab\footnote{\label{Footnote:decomposition-project-gitlab-url}Decomposition GitLab repository URL: \url{https://mmg-gitlab.fjfi.cvut.cz/gitlab/tnl/lu-decomposition}}. Since the project is continually under development it is only available internally,
 i.e. to users belonging to the TNL group on the Mathematical Modelling Group's\footnote{MMG main page URL: \url{https://geraldine.fjfi.cvut.cz/mmg/index.php}} GitLab page\footnote{TNL GitLab group URL: \url{https://mmg-gitlab.fjfi.cvut.cz/gitlab/tnl}}. \\
-Although development was done outside of TNL, its structuring and building processes were adopted with minor changes to allow for easier familiarization and to keep the option of incorporating the Decomposition project into TNL open for the future. The compilation/installation of the project is done using the \code{install} Bash script that was adopted from TNL. The script itself serves as a wrapper for the \code{build} script that takes several building arguments, for example, the mandatory target parameter allows the user to choose to build one of the following:
-
-\begin{itemize}
-	\item \code{all} - compile the entire project including all other targets and the algorithm implementations.
-	\item \code{benchmark} - compile the benchmark only.
-	\item \code{tests} - compile the unit tests only.
-\end{itemize}
-
-Additionally, the \code{build} script provides optional parameters that can aid in compilation, for example:
-\begin{itemize}
-	\item \code{---install} - enables installation of the Decomposition project files into \code{\$HOME/.local/include}.
-	\item \code{---cmake} - allows the user to supply the path to the CMake that is to be used for compilation.
-	\item \code{---with-cuda-arch} - allows the user to specify the CUDA compute capability version to compile the project with. While there is an auto-detect feature for this parameter, the manual setting can be indispensable in some situations, for example, when running the benchmark on a computational cluster the compilation is usually done beforehand on a node that is not guaranteed to have a CUDA-enabled GPU. 
-\end{itemize}
-
-The full list of compilation options (\code{build} script usage) can be found in the Decomposition GitLab repository\footref{Footnote:decomposition-project-gitlab-url}. \\
-The \code{build} script then calls CMake\footnote{CMake website URL: \url{https://cmake.org/}} which subsequently takes care of the build process using instructions from \code{CMakeLists.txt} files interspersed throughout the project. \\
 The Decomposition project was written in \textit{C++} which was extended by \textit{CUDA} (GPU programming) and \textit{GoogleTest}\footnote{\label{Footnote:google-test}GoogleTest GitHub repository URL: \url{https://github.com/google/googletest}} (unit testing - approach adopted from TNL's matrix unit tests). Additionally, \textit{Python}\footnote{Python website URL: \url{https://www.python.org/}} and \textit{Bash}\footnote{Bash website URL: \url{https://www.gnu.org/software/bash/}} were used when adopting scripts from TNL, for example, a python script that creates tables and graphs in HTML from json files generated by the benchmark. \\
-In this section, each part of the project's structure will be briefly described. First, unit tests will be detailed followed by the implementation of the Crout method (introduced in Section~\ref{Subsection:theory-LU-decomposition-crout-method}), along with the Iterative Crout method (introduced in Section~\ref{Subsection:theory-LU-decomposition-numerical-method}). Finally, the last part focuses on the benchmark implementation that aims to put into perspective the performance differences between the direct and iterative approach. \\
-The ordering of topics follows the development process which was inspired by Test-driven development\footnote{Test-driven development Wikipedia page URL: \url{https://en.wikipedia.org/wiki/Test-driven_development}} (TDD). Specifically, the unit tests were written first; they were purposefully failing. Then, the implementation of the Crout method, along with the Iterative Crout method followed; this saw the unit tests passing. Finally, the benchmark was added as a feature at the end - without unit tests.
+First, the installation procedure and unit tests will be briefly introduced, followed by a detailed description of the implementations of the algorithms. Then, the benchmark implementation that aims to put into perspective the performance differences between the direct and iterative approach will be presented.
 
-\subsection{Unit Tests \TO}
-Despite the simplicity of this project - implementation of two short algorithms - quality assurance is still a key factor that aims to minimize erring development. Not counting manual verification of functionalities, unit tests are the most basic form of quality assurance. They allow for continual development with near-instant feedback on any changes in the implementation. \\
-As mentioned before, GoogleTest\footref{Footnote:google-test} was chosen as the testing framework. The main reasons behind this choice were:
+\paragraph{Installation procedure} Although development was done outside of TNL, its structuring and building processes were adopted with minor changes to allow for easier familiarization and to keep the option of incorporating the \textit{Decomposition} project into TNL open for the future. This part will briefly describe the project's installation procedure. The prerequisites required for the installation of the project along with their recommended versions are the following:
 
 \begin{itemize}
-	\item GoogleTest was used successfully to implemented unit tests in TNL.
-	\item GoogleTest has the ability to run tests of a test suite across class instances with different hard-set template parameter values.
-	\item GoogleTest is simple to use and can be easily integrated with the Decomposition project.
-	\item GoogleTest fully supports C++ and is still actively being developed (roughly at least one merged pull request a week as of July 2022).
+	\item GCC 8.4.0 or later - for the compilation of the project.
+	\item CUDA 11.5 or later - for computation on Nvidia GPUs.
+	\item CMake 3.20.5 or later - for building the project.
+	\item Python 3.9 or later - optional, for using the script that transforms the benchmark results to graphs and tables.
 \end{itemize}
 
-As the testing infrastructure was mostly adopted from TNL (detailed in Section 3.1 of the author's bachelor thesis \emph{Formats for storage of sparse matrices on GPU} \cite{Cejka2020}) it will only be described briefly.
+Once all of the requirements are installed, then the installation procedure itself comprises of the following steps:
 
-\par For each algorithm (Crout method and Iterative Crout method) a suite of unit tests was written. The aim of the tests was to verify that a matrix was decomposed within some reasonable error range which was obtained by comparing the decomposition result to either existing solutions or solutions computed by programs, such as MATLAB\footnote{MATLAB website URL: \url{https://www.mathworks.com/products/matlab.html}}. Examples of tests are:
+\begin{enumerate}
+	\item Install the TNL library according to its documentation on the TNL website\footnote{TNL library installation instructions URL: \url{https://tnl-project.gitlab.io/tnl/\#installation}}. Note that in order for the required TNL files to be installed, it is important to use the target \code{all} and to include the \code{----install=yes} installation option.
+	\item Install the Decomposition project using the following command: \code{./install ----install=yes all}. Note that the full list of compilation options can be displayed using \code{./install ----help}.
+\end{enumerate}
 
-\begin{itemize}
-	\item \code{test\_CroutMethod2x2MatrixDecompose< MatrixType >()} - Test that the algorithm will decompose a 2x2 matrix correctly. The decomposition of a small matrix is likely to produce its exact solution, thus, tests where a such a matrix is decomposed can have zero tolerance when it comes to checking for errors in computation.
-	\item \code{test\_CroutMethod38x38MatrixDecompose< MatrixType >()} - Test that the algorithm will decompose a 38x38 matrix correctly with some tolerance. The tolerance for solutions is required as the larger the dimensions, the more prone to differences the solutions are. This erring behavior is due to the limited accuracy of double and single precision when compared to, for example, MATLAB.
-	\item \code{test\_CroutMethod10x10DecomposeSingularMatrixShouldFail< MatrixType >()} - Test that the algorithm will fail to decompose a 10x10 singular matrix. The execution of the program will fail as such a matrix cannot be decomposed without a permutation matrix which is not in the scope of this project.
-\end{itemize}
-
-In the examples of tests above, the \code{MatrixType} template parameter represents an instance of the \code{DenseMatrix} class from the set of instances which can be seen in Listing~\ref{Listing:implementation-decomposition-project-unit-tests-instances-set}. Additionally, Listing~\ref{Listing:implementation-decomposition-project-unit-tests-2x2-matrix-decomposition-test} shows the implementation of the 2x2 matrix test mentioned above in the list of examples and also in Listing~\ref{Listing:implementation-decomposition-project-unit-tests-instances-set}.
-
-\begin{lstlisting}[caption={Implementation of the set of \code{DenseMatrix} instances and one test using GoogleTest. The unit tests are all run for each instance. The test suite is tied to the set of instances using \code{TYPED\_TEST\_SUITE} and each test is added to the test suite using the declaration \code{TYPED\_TEST}. Taken from the Decomposition project repository on GitLab\protect\footref{Footnote:decomposition-project-gitlab-url}.},label={Listing:implementation-decomposition-project-unit-tests-instances-set}]
-template< typename Matrix >
-class ILUCroutMethodTest : public ::testing::Test
-{
-	protected:
-		using MatrixType = Matrix;
-};
-
-using MatrixTypes = ::testing::Types<
-TNL::Matrices::DenseMatrix< float,  TNL::Devices::Host, short >,
-TNL::Matrices::DenseMatrix< double, TNL::Devices::Host, short >,
-TNL::Matrices::DenseMatrix< float,  TNL::Devices::Host, int   >,
-TNL::Matrices::DenseMatrix< double, TNL::Devices::Host, int   >,
-TNL::Matrices::DenseMatrix< float,  TNL::Devices::Host, long  >,
-TNL::Matrices::DenseMatrix< double, TNL::Devices::Host, long  >
-#ifdef HAVE_CUDA
-,TNL::Matrices::DenseMatrix< float, TNL::Devices::Cuda, short, TNL::Algorithms::Segments::RowMajorOrder >,
-TNL::Matrices::DenseMatrix< double, TNL::Devices::Cuda, short, TNL::Algorithms::Segments::RowMajorOrder >,
-TNL::Matrices::DenseMatrix< float,  TNL::Devices::Cuda, int,   TNL::Algorithms::Segments::RowMajorOrder >,
-TNL::Matrices::DenseMatrix< double, TNL::Devices::Cuda, int,   TNL::Algorithms::Segments::RowMajorOrder >,
-TNL::Matrices::DenseMatrix< float,  TNL::Devices::Cuda, long,  TNL::Algorithms::Segments::RowMajorOrder >,
-TNL::Matrices::DenseMatrix< double, TNL::Devices::Cuda, long,  TNL::Algorithms::Segments::RowMajorOrder >
-#endif
->;
-
-TYPED_TEST_SUITE( ILUCroutMethodTest, MatrixTypes );
-
-TYPED_TEST( ILUCroutMethodTest, croutMethod2x2MatrixDecomposeTest )
-{
-	using MatrixType = typename TestFixture::MatrixType;
-	test_CroutMethod2x2MatrixDecompose< MatrixType >();
-}
-\end{lstlisting}
-
-\begin{lstlisting}[caption={Implementation of the test where a 2x2 \code{DenseMatrix} instance is decomposed. As mentioned before, the matrix decomposed in this test is small and therefore the decomposed $ \mathbb{L} $ and $ \mathbb{U} $ matrices are expected to be exact solutions rather than within some range of the exact solution. Taken from the Decomposition project repository on GitLab\protect\footref{Footnote:decomposition-project-gitlab-url}.},label={Listing:implementation-decomposition-project-unit-tests-2x2-matrix-decomposition-test}]
-template< typename Matrix >
-void test_CroutMethod2x2MatrixDecompose()
-{
-	const Matrix A( {
-		{ 4, 24 },
-		{ 2, 15 }
-	} );
-	
-	Matrix L, U;
-	L.setLike( A );
-	U.setLike( A );
-	
-	Decomposition::LU::CroutMethodIterative::decompose( A, L, U );
-	
-	EXPECT_EQ( L.getElement( 0, 0 ),  4.0 );
-	EXPECT_EQ( L.getElement( 0, 1 ),  0.0 );
-	EXPECT_EQ( L.getElement( 1, 0 ),  2.0 );
-	EXPECT_EQ( L.getElement( 1, 1 ),  3.0 );
-
-	EXPECT_EQ( U.getElement( 0, 0 ),  1.0 );
-	EXPECT_EQ( U.getElement( 0, 1 ),  6.0 );
-	EXPECT_EQ( U.getElement( 1, 0 ),  0.0 );
-	EXPECT_EQ( U.getElement( 1, 1 ),  1.0 );
-}
-
-\end{lstlisting}
-
-Since the unit tests are run with every compilation of the algorithms they had to be lightweight. Thus, matrix dimensions of tested matrices ranged from 2x2 to only 38x38 and included the following: 2x2, 3x3, 4x4, 10x10, 19x19 and 38x38. The larger dimensions - from 10x10 - were chosen to test a specific part of the Iterative Crout method's implementation on the GPU: matrix convergence by sections (detailed in Section~\ref{Subsection:implementation-decomposition-project-lu-decomposition}).
-
+\paragraph{Unit Tests} Another important part of the project were the unit tests. Their structure was adopted from TNL, however, the tests themselves were slightly altered to meet the requirements of the decomposition implementations. Since the unit tests are run with every compilation of the algorithms they had to be lightweight. Specifically, the tests include the decomposition of a set of matrices with varying dimensions using the implementations. The matrix dimensions ranged from $2 \times 2$ to $ 38 \times 38 $ and included the following: $ 2 \times 2 $, $ 3 \times 3 $, $ 4 \times 4 $, $ 10 \times 10 $, $ 19 \times 19 $ and $ 38 \times 38 $. The larger dimensions - from 10x10 - were chosen to test a specific part of the Iterative Crout method's implementation on the GPU: \textit{\nameref{Subparagraph:implementation-decomposition-project-lu-decomposition-iterative-crout-method-convergence-by-sections}} (detailed in Section~\ref{Subparagraph:implementation-decomposition-project-lu-decomposition-iterative-crout-method-convergence-by-sections}).
 
 \subsection{LU Decomposition \TO}\label{Subsection:implementation-decomposition-project-lu-decomposition}
 The core of the Decomposition project is made up of the Crout method and the Iterative Crout method, detailed in Section~\ref{Subsection:theory-LU-decomposition-crout-method} and Section~\ref{Subsection:theory-LU-decomposition-numerical-method} respectively. This part contains a description of their implementations. First, it is necessary to introduce a memory-saving concept used in this project. Then, the requirements for the implementations will be presented and, finally, the description of the implementations of the individual algorithms will follow.
@@ -219,8 +131,6 @@ In other words, this means implementing the following:
 	\item Crout method for the CPU detailed in Section~\ref{Subsection:theory-LU-decomposition-crout-method}.
 	\item Iterative Crout method for the GPU detailed in Section~\ref{Subsection:theory-LU-decomposition-numerical-method}.
 \end{enumerate}
-
-As mentioned at the beginning of this Section, the process of development was inspired by TDD. Thus, once unit tests were implemented and successfully failing, the implementation of the algorithms began.
 
 \paragraph{Crout method}\label{Paragraph:implementation-decomposition-project-lu-decomposition-crout-method}
 The Crout method - as described in Section~\ref{Subsection:theory-LU-decomposition-crout-method} - was implemented only for the CPU as implementing it on the GPU would not bring any interesting results since it is a sequential algorithm. \\
