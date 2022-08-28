@@ -1,4 +1,4 @@
-﻿id,matrix-name,base,sm,sm-opt,computation-row-005-tol,computation-row-0-tol,parallel-section-size-gpucap,icm32,base-diff,computation-row-005-diff,computation-row-0-diff,parallel-section-size-gpucap-diff,icm32-diff
+﻿id,matrix-name,base,sm,sm-opt,processing-row-005-tol,processing-row-0-tol,parallel-section-size-gpucap,icm32,base-diff,processing-row-005-diff,processing-row-0-diff,parallel-section-size-gpucap-diff,icm32-diff
 0,ex5.mtx,0.001105,0.001123,0.001102,0.001117,0.001239,0.001524753,0.001386,4.06605E-05,4.07E-05,3.49246E-10,3.49246E-10,3.49246E-10
 1,bcsstk01.mtx,0.001166,0.001514,0.001451,0.001787,0.001841,0.001662743,0.002201,9.53674E-07,9.54E-07,9.53674E-07,9.53674E-07,9.53674E-07
 2,bcsstk02.mtx,0.002304,0.003284,0.000085,0.003632,0.000103,0.003106737,0.000118,8.84176E-06,8.84E-06,4.54747E-12,4.54747E-12,4.54747E-12
