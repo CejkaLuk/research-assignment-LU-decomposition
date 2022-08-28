@@ -238,7 +238,7 @@ The GPU implementation can be split into two parts:
 	\item Convergence of a single section using the Iterative Crout method detailed in Section~\ref{Subsection:theory-LU-decomposition-numerical-method}.
 \end{enumerate}
 
-\subparagraph{Convergence by Sections}\label{Subparagraph:implementation-decomposition-project-lu-decomposition-iterative-crout-method-convergence-by-sections}
+\subparagraph{Computation by sections}\label{Subparagraph:implementation-decomposition-project-lu-decomposition-iterative-crout-method-convergence-by-sections}
 This part leverages advantages from both the sequential and parallel versions of the Crout method in order to optimize the entire procedure. \\
 Similarly to the Iterative algorithm detailed in Section~\ref{Subsection:theory-LU-decomposition-numerical-method}, the \textit{convergence by sections} concept begins by providing an initial estimate of matrix $ \mathbb{Z} $, for example, $ \mathbb{Z} = \mathbb{A}$. Then, $ \mathbb{Z} $ is divided into submatrices of equal size (in this project, the submatrices are referred to as \textit{sections} and are labeled with $ _{sub} $, for example, $ \mathbb{Z}_{sub} $). Then, beginning in the top-left corner, the sections are sequentially converged (equivalent to a submatrix being decomposed) using the Iterative Crout method algorithm described in Section~\ref{Subsection:theory-LU-decomposition-numerical-method}. The order in which sections are converged is crucial to achieving near-optimal execution times; it is shown in Figure~\ref{Figure:implementation-decomposition-project-lu-decomposition-order-of-convergence-of-sections}.
 
