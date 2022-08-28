@@ -3,6 +3,89 @@
 \appendix 								 	% DO NOT TOUCH!
 
 
+\chapter{Crout Method Implementation for the CPU}\label{Attachment:crout-method-implementation-CPU}
+The Crout method implementation for the CPU using matrices $ \mathbb{L} $ and $ \mathbb{U} $ is shown in Listing~\ref{Listing:crout-method-implementation-CPU-LU} and using matrix $ \mathbb{Z} $ in Listing~\ref{Listing:crout-method-implementation-CPU-Z}.
+\begin{lstlisting}[language={},caption={Implementation of the Crout method on the CPU using matrices $ \mathbb{L} $ and $ \mathbb{U} $. All matrix and variable types are obtained from template arguments of the method. Taken from the Decomposition project repository on GitLab\protect\footref{Footnote:decomposition-project-gitlab-url}.},label={Listing:crout-method-implementation-CPU-LU}]
+	template< typename Matrix1, typename Matrix2, typename Matrix3 >
+	void CroutMethod::decompose( Matrix1& A, Matrix2& L, Matrix3& U )
+	{
+		using RealType  = typename Matrix1::RealType;
+		using IndexType = typename Matrix1::IndexType;
+		
+		IndexType num_rows = A.getRows();
+		IndexType num_cols = A.getColumns();
+		
+		TNL_ASSERT_EQ( num_rows, num_cols, "Matrix A must be a square matrix!" );
+		
+		IndexType i, j, k;
+		RealType sum = 0;
+		
+		for( j = 0; j < num_rows; ++j )	{
+			for( i = j; i < num_rows; ++i ) {
+				sum = 0;
+				for( k = 0; k < j; ++k ) {
+					sum = sum + L.getElement( i, k ) * U.getElement( k, j );
+				}
+				
+				L.setElement( i, j, A.getElement( i, j ) - sum );
+			}
+			
+			for( i = j; i < num_rows; ++i ) {
+				TNL_ASSERT( L.getElement( j, j ) != 0, std::cerr << "L( " << i << ", " << j << " ) = 0. Cannot divide by 0." << std::endl );
+				sum = 0;
+				for( k = 0; k < j; ++k ) {
+					sum = sum + L.getElement( j, k ) * U.getElement( k, i );
+				}
+				
+				U.setElement( j, i, ( A.getElement( j, i ) - sum ) / L.getElement( j, j ) );
+			}
+		}	
+	}
+\end{lstlisting}
+
+\begin{lstlisting}[language={},caption={Implementation of the Crout method on the CPU using matrix $ \mathbb{Z} $. Taken from the Decomposition project repository on GitLab\protect\footref{Footnote:decomposition-project-gitlab-url}.},label={Listing:crout-method-implementation-CPU-Z}]
+	template< typename Matrix1, typename Matrix2 >
+	void CroutMethod::decompose( Matrix1& A, Matrix2& Z )
+	{
+		using RealType  = typename Matrix1::RealType;
+		using IndexType = typename Matrix1::IndexType;
+		
+		IndexType num_rows = A.getRows();
+		IndexType num_cols = A.getColumns();
+		
+		TNL_ASSERT_EQ( num_rows, num_cols, "Matrix A must be a square matrix!" );
+		
+		IndexType i, j, k;
+		RealType sum = 0;
+		
+		for( j = 0; j < num_rows; ++j )	{
+			for( i = j; i < num_rows; ++i ) {
+				sum = 0;
+				for( k = 0; k < j; ++k ) {
+					sum = sum + Z.getElement( i, k ) * Z.getElement( k, j );
+				}
+				
+				Z.setElement( i, j, A.getElement( i, j ) - sum );
+			}
+			
+			for( i = j; i < num_rows; ++i ) {
+				if( j == i ) continue;
+				
+				TNL_ASSERT( Z.getElement( j, j ) != 0, std::cerr << "Z( " << j << ", " << j << " ) = 0. Cannot divide by 0." << std::endl );
+				sum = 0;
+				for( k = 0; k < j; ++k ) {
+					sum = sum + Z.getElement( j, k ) * Z.getElement( k, i );
+				}
+				
+				Z.setElement( j, i, ( A.getElement( j, i ) - sum ) / Z.getElement( j, j ) );
+			}
+		}
+	}
+\end{lstlisting}
+
+
+
+
 \chapter{Random Dense Matrix Generator Script}\label{Attachment:random-dense-matrix-generator}
 The Python script used to generate random dense matrices that were later decomposed in the benchmark can be seen in Listing~\ref{Listing:random-dense-matrix-generator}.
 \begin{lstlisting}[language=Python,caption={Python script for generating random dense matrices in the \emph{SuitSparse Matrix Collection} \cite{Davis2011} format. On line~\ref{Line:eliminate-zeros-from-dense-matrix} it can be seen that any zeros were incremented which was done to assure that the matrices produced would be both strongly regular and composed only of nonzero elements.},label={Listing:random-dense-matrix-generator},escapechar=@]

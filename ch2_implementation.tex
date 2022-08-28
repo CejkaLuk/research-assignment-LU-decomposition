@@ -224,7 +224,7 @@ As mentioned at the beginning of this Section, the process of development was in
 
 \paragraph{Crout method}\label{Paragraph:implementation-decomposition-project-lu-decomposition-crout-method}
 The Crout method - as described in Section~\ref{Subsection:theory-LU-decomposition-crout-method} - was implemented only for the CPU as implementing it on the GPU would not bring any interesting results since it is a sequential algorithm. \\
-Since the implementation of the Crout method in the Decomposition project differs only slightly from the pseudocode shown in Listing~\ref{Listing:theory-LU-decomposition-crout-method-pseudocode}, the code will not be shown in this thesis - it can be found in the project's GitLab repository\footref{Footnote:decomposition-project-gitlab-url}. \\
+Since the implementation of the Crout method in the Decomposition project differs slightly from the pseudocode shown in Listing~\ref{Listing:theory-LU-decomposition-crout-method-pseudocode}, the code is shown only in Attachment~\ref{Attachment:crout-method-implementation-CPU}. \\
 One of the noticeable differences between the pseudocode from Listing~\ref{Listing:theory-LU-decomposition-crout-method-pseudocode} and the implementations is that the lines where the elements on the main diagonal of $ \mathbb{U} $ are all set to 1s are not present in the latter. They were removed as it was observed that they were not needed since the algorithm would compute them regardless.
 
 \paragraph{Iterative Crout method}\label{Paragraph:implementation-decomposition-project-lu-decomposition-iterative-crout-method}
