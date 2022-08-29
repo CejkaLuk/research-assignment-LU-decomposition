@@ -5,7 +5,7 @@
 
 \chapter{Crout Method Implementation for the CPU}\label{Attachment:crout-method-implementation-CPU}
 The Crout method implementation for the CPU using matrices $ \mathbb{L} $ and $ \mathbb{U} $ is shown in Listing~\ref{Listing:crout-method-implementation-CPU-LU} and using matrix $ \mathbb{Z} $ in Listing~\ref{Listing:crout-method-implementation-CPU-Z}.
-\begin{lstlisting}[language={},caption={Implementation of the Crout method on the CPU using matrices $ \mathbb{L} $ and $ \mathbb{U} $. All matrix and variable types are obtained from template arguments of the method. Taken from the Decomposition project repository on GitLab\protect\footref{Footnote:decomposition-project-gitlab-url}.},label={Listing:crout-method-implementation-CPU-LU}]
+\begin{lstlisting}[caption={Implementation of the Crout method on the CPU using matrices $ \mathbb{L} $ and $ \mathbb{U} $. All matrix and variable types are obtained from template arguments of the method. Taken from the Decomposition project repository on GitLab\protect\footref{Footnote:decomposition-project-gitlab-url}.},label={Listing:crout-method-implementation-CPU-LU}]
 	template< typename Matrix1, typename Matrix2, typename Matrix3 >
 	void CroutMethod::decompose( Matrix1& A, Matrix2& L, Matrix3& U )
 	{
@@ -43,7 +43,7 @@ The Crout method implementation for the CPU using matrices $ \mathbb{L} $ and $ 
 	}
 \end{lstlisting}
 
-\begin{lstlisting}[language={},caption={Implementation of the Crout method on the CPU using matrix $ \mathbb{Z} $. Taken from the Decomposition project repository on GitLab\protect\footref{Footnote:decomposition-project-gitlab-url}.},label={Listing:crout-method-implementation-CPU-Z}]
+\begin{lstlisting}[caption={Implementation of the Crout method on the CPU using matrix $ \mathbb{Z} $. Taken from the Decomposition project repository on GitLab\protect\footref{Footnote:decomposition-project-gitlab-url}.},label={Listing:crout-method-implementation-CPU-Z}]
 	template< typename Matrix1, typename Matrix2 >
 	void CroutMethod::decompose( Matrix1& A, Matrix2& Z )
 	{
