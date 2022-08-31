@@ -1,0 +1,80 @@
+#!/usr/bin/env bash
+
+# exit whenever a command fails
+set -e
+
+# enable recursive globbing
+shopt -s globstar
+
+## Number of threads per block squared to test
+declare -a threads_in_blocks=(8 16 32)
+
+## Precisions to test
+declare -a precisions=("double" "float")
+
+DEBUG="no"
+
+echo -e "\n=== RUNNING Decomposition benchmark\n\n"
+
+for precision in "${precisions[@]}"
+do
+   BENCHMARK="decomposition-benchmark --precision $precision --openmp-enabled no"
+   BENCHMARK_DBG="decomposition-benchmark-dbg"
+
+   ## Beginning time
+   SECONDS=0
+
+   for i in "${threads_in_blocks[@]}"
+   do
+      echo -e "\n\n=== Benchmark:"
+      echo -e "\tPrecision: $precision \tBLOCK_SIZE: $i"
+
+      echo "-> CroutMethodIterative.h: #define BLOCK_SIZE $i"
+      cd ../../../
+      sed -i "s/#define BLOCK_SIZE [[:digit:]]\+/#define BLOCK_SIZE $i/" src/Decomposition/LU/CroutMethodIterative.h
+
+      echo "---> Removing compiled files in $HOME/.local/, Debug and Release"
+      rm -rf ~/.local/include/Decomposition/ Debug/ Release
+
+      echo "---> Compiling Decomposition..."
+      ./install --install=yes all
+
+      cd src/Benchmark/scripts/
+
+      matrices_base_path="./mtx-matrices"
+      log_file="./log-files/decomposition-benchmark-${i}x${i}TpB_${precision}.log"
+
+      if [[ ! -d "$matrices_base_path" ]]; then
+         echo "The path '$matrices_base_path' does not exist." >&2
+         exit 1
+      fi
+
+      if [[ ! -d "$(dirname "$log_file")" ]]; then
+         mkdir -p "$(dirname "$log_file")"
+      fi
+
+      if [[ -f "$log_file" ]]; then
+         echo "WARNING: deleting an existing log file $log_file"
+         rm -f "$log_file"
+      fi
+
+      date
+      for matrix in "$matrices_base_path"/**/*.mtx; do
+         echo "-> Running benchmark for: $matrix"
+         echo "-> log_file: $log_file"
+         if [[ "$DEBUG" == "yes" ]]; then
+            gdb --args $BENCHMARK_DBG --input-file "$matrix" --log-file "$log_file" --output-mode append --verbose 1
+         else
+            $BENCHMARK --input-file "$matrix" --log-file "$log_file" --output-mode append --verbose 1 --threads-squared-per-block $i --machine "lukas-pc"
+         fi
+         date
+      done
+
+   done
+
+   ## End timer
+   ELAPSED="Elapsed: $(($SECONDS / 3600))hrs $((($SECONDS / 60) % 60))min $(($SECONDS % 60))sec"
+   echo $ELAPSED
+done
+
+echo -e "\n=== FINISHED Decomposition benchmark\n\n"

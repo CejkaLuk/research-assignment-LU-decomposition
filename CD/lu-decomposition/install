@@ -1,0 +1,78 @@
+#!/bin/bash
+
+set -e
+
+BUILD_DEBUG="yes"
+BUILD_RELEASE="yes"
+
+OPTIONS=""
+
+for option in "$@"; do
+   case $option in
+      --no-debug)
+         BUILD_DEBUG="no"
+         ;;
+      --no-release)
+         BUILD_RELEASE="no"
+         ;;
+      --build=*                     )
+         BUILD="${option#*=}"
+         if [[ "$BUILD" != "Release" ]]; then
+            BUILD_RELEASE="no"
+         fi
+         if [[ "$BUILD" != "Debug" ]]; then
+            BUILD_DEBUG="no"
+         fi
+         ;;
+      *)
+         OPTIONS="${OPTIONS} ${option}"
+         ;;
+   esac
+done
+
+if [[ ${BUILD_DEBUG} == "yes" ]]; then
+   if [[ ! -d Debug ]]; then
+      mkdir Debug
+   fi
+   pushd Debug
+   if ! ../build --build=Debug --install=yes ${OPTIONS}; then
+      echo "Debug build failed."
+      exit 1
+   fi
+   popd
+fi
+
+if [[ ${BUILD_RELEASE} == "yes" ]]; then
+   if [[ ! -d Release ]]; then
+      mkdir Release
+   fi
+   pushd Release
+   if ! ../build --build=Release --install=yes ${OPTIONS}; then
+      echo "Release build failed."
+      exit 1
+   fi
+   popd
+fi
+
+
+PREFIX=${HOME}/.local
+for option in "$@"; do
+    case $option in
+        --prefix=*) PREFIX="${option#*=}" ;;
+    esac
+done
+
+
+if [[ ! "$PATH" =~ "$PREFIX/bin" ]]; then
+    cat << EOF
+
+WARNING !!!
+
+Your system does not see TNL which was installed right now.
+You need to add it to your system variables PATH and LD_LIBRARY_PATH.
+Add the following to your .bashrc file:
+
+export PATH="\${PATH}:${PREFIX}/bin"
+export LD_LIBRARY_PATH="\${LD_LIBRARY_PATH}:${PREFIX}/lib"
+EOF
+fi

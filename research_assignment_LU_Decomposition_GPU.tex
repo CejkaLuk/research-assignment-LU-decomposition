@@ -1,39 +1,59 @@
-\documentclass[12pt,a4paper,oneside,czech,american]{book} % TODO: Update 'oneside' or 'twoside' - depending on number of pages
-
-%%% TODO:
-% * Create bibliography file? Can we do custom source format?
-% * Create tex files for chapters - see Juriad or MAK2 essay for examples
+\documentclass[11pt,twoside,czech,american]{book}
 
 %%% Packages:
 %% Necessary packages:
 \usepackage[T1]{fontenc}		% Font encoding
 \usepackage[utf8]{inputenc}		% Input encoding
-\usepackage[a4paper, hmarginratio=3:2]{geometry}	% Use of the A4 page and setting the margins (the binding will be wider)
+\usepackage[a4paper]{geometry}	% Use of the A4 page and setting the margins (the binding will be wider)
 
 %% Other packages:
 % Code:
 \usepackage{listings} 			 % Code formatting package
 
 % Fonts:
-\usepackage[hidelinks]{hyperref} % Hide square around URL link.
 \usepackage{amsmath}  			 % Advanced mathematic package
-\usepackage{color}    			 % Colorful text
+\usepackage{xcolor}    			 % Colorful text
+\usepackage{soul}				 % Text fonts syllable by syllable - used for in-text codifying
+\usepackage[varg]{txfonts}		 % Times New Roman fonts and math alphabets, for example, provides \mathbb{}
 
 % Graphics:
 \usepackage{graphicx} 			 % Insert raster graphic files (PNG etc.)
 \usepackage{epsfig} 			 % Insert EPS graphics files
 \usepackage{float} 			  	 % Advanced figure placement options
-\usepackage{caption} 			 % Captions of figure, tables, etc.
+\usepackage{wrapfig}			 % Wrap text around a figure
+\usepackage{caption} 			 % Captions of figures, tables, etc.
+\usepackage{subcaption}			 % Sub-captions of figures, tables, etc. 
+\usepackage{nicematrix, tikz}	 % Visual representation of matrices, graphs etc. - 'nicematrix' is experimental
+\usetikzlibrary{plotmarks, positioning, fit}
+\usetikzlibrary{decorations.pathreplacing, matrix, calc, shapes.arrows}
+\usepackage{pgfplots} 			 % For visualizations, graphics, etc.
+\pgfplotsset{compat=1.3}		 % Use pgfplots version 1.3 specifically
 
 % Languages:
 \usepackage{babel}
 
 % Page formatting:
-% TODO: Replace placeholder PDF with scan of orignal task paper
 \usepackage{pdfpages}			 % Add PDFs into compiled PDF
+
+% Referencing:
+\usepackage{footmisc} 							 		  % Refer to footnotes that already exist
+\usepackage[backend=biber,								  % In TeXstudio, the backend here must correspond to: Options -> Configure TeXstudio... -> Build -> Default Bibliography Tool
+			style=iso-numeric,
+			sorting=none,
+			giveninits=true]{biblatex} 					  % Bibliography: ISO 690 format, cite shows numbers, sort according to occurence in text, shorten first names
+\addbibresource{bibliography.bib}				 		  % Specify path to bibliography file
+\DeclareFieldFormat{labelnumberwidth}{\mkbibbrackets{#1}} % Square brackets around numbers in the bibliography
+\setcounter{biburllcpenalty}{7000}						  % Insert breakpoints after lowercase letters in URLs in the bibliography
+\setcounter{biburlucpenalty}{8000}						  % Insert breakpoints after uppercase letters in URLs in the bibliography
+\usepackage{csquotes}									  % Ensure that quoted texts are typeset according to the rules of the main language
+\usepackage{xurl}										  % URL formatting: better linebreaks in footnotes, etc.
 
 % Tables:
 \usepackage{tabularx}			 % Advanced table options
+\usepackage{colortbl} 			 % Table cell color
+
+% Fonts (must be mentioned last to avoid warnings in the log)
+\usepackage[hidelinks]{hyperref} % Hide square around URL link
 
 %%% Document settings:
 % TODO: Play around with the following if the formatting of pages turns out weird
@@ -41,25 +61,74 @@
 \clubpenalty=9500 	   % Completely avoid orphans (first lines of a new paragraph on the bottom of a page)
 \brokenpenalty=9500    % Prohibit page breaks after a line that has a split word at the end
 
-\topmargin=-15mm      % Upper edge slightly smaller
-\textwidth=150mm      % Text width on the page
-\textheight=240mm     % Height of the text on the page
-
+\geometry{verbose,tmargin=4cm,bmargin=3cm,lmargin=3cm,rmargin=2cm,headheight=0.8cm,headsep=1cm,footskip=0.5cm} % Setup from bachelor thesis - provides more space for the content on a page
+\raggedbottom 		   % All pages the height of the text on that page. No extra vertical space is added
 \pagenumbering{arabic} % Page numbering in Arabic numerals
 \pagestyle{plain}      % Page numbering at the bottom center
 
-\parindent=0pt 		  % Indentation of the 1st line of the paragraph
-\parskip=7pt   		  % Spacing between paragraphs
+\parindent=0pt 		   % Indentation of the 1st line of the paragraph
+
+\setlength{\emergencystretch}{17.5pt} % Allow compiler to create more spaces between words to avoid overflow of text
+
+
+%%% Custom colors:
+\definecolor{nvidia}{rgb}{0.6, 0.73, 0.35}		% Nvidia color
+\definecolor{lightnvidia}{rgb}{0.92, 1.0, 0.85} % Nvidia light color
+\definecolor{light-gray}{gray}{0.95}			% In-text code highlighting color
+\definecolor{lbcolor}{rgb}{0.9,0.9,0.9}			% Code block background color
+\definecolor{Darkgreen}{rgb}{0.0, 0.2, 0.13}	% Code block comments color
+
+
+%%% Custom code block:
+\lstset{
+	backgroundcolor=\color{lbcolor}, % Background color of the code block
+	upquote=true,					 % Format of quote: true -> '', false -> ‘’
+	columns=fixed,					 % Characters are below each other (each column is one character -> fixed column size)
+	extendedchars=false,			 % Allow national characters, for example, Czech diacritics. If true, then load any package that defines the characters, for example, fontenc, or inputenc, etc.
+	showtabs=false,					 % Tabulators visible or not
+	showspaces=false,				 % All blank spaces visible as _ or not
+	showstringspaces=false,			 % Blank spaces in strings visible as _ or not 
+	identifierstyle=\ttfamily,		 % Code font to be monospace if the line begins with one of the following: a-z, A-Z, @, $ and _
+	language=C++,					 % Default language syntax highlighting for code blocks
+	captionpos=b,					 % Position of the caption. b - bottom; t - top of the listing
+	tabsize=2,						 % Set tabulator stops			
+	frame=lines,					 % Draw a line on the top and bottom of the code listing -> frame
+	numbers=left,					 % Print line numbers on the left of the code block
+	numberstyle=\tiny,				 % Font and size of line numbers
+	numbersep=5pt,					 % Distance between line numbers and the code block
+	basicstyle=\footnotesize,		 % Basic font. Selected at the beginning of each listing
+	keywordstyle=\color[rgb]{0,0,1}, % Fond of language keywords in a specific font
+	commentstyle=\color{Darkgreen},	 % Font of comments in code block
+	stringstyle=\color{red},		 % Font of non-keywords, comments and strings
+	breaklines=true,				 % Breaking of long lines
+	prebreak = \raisebox{0ex}[0ex][0ex]{\ensuremath{\hookleftarrow}}, % Line-break symbol if a line of code is too long
+}
+% Extend C++ with CUDA keywords - not supported in lstlisting by default.
+\lstset{
+	morekeywords={__global__},
+	morekeywords={__device__},
+	morekeywords={blockDim.x},
+	morekeywords={blockDim.y},
+	morekeywords={blockIdx.x},
+	morekeywords={blockIdx.y},	
+	morekeywords={threadIdx.x},
+	morekeywords={threadIdx.y},
+	morekeywords={gridDim.x},
+	morekeywords={__shared__},
+	morekeywords={dim3},
+	alsoletter={.}			   % Make the font be applied for dots
+}
 
 
 %%% Custom commands:
-\newcommand{\ti}{\textit} % Shortcut for cursive font
-\newcommand{\tb}{\textbf} % Shortcut for bold fond
+\newcommand{\ti}{\textit} 								  									   % Shortcut for cursive font
+\newcommand{\tb}{\textbf} 								  									   % Shortcut for bold fond
+\DeclareRobustCommand{\code}[1]{{\begingroup\sethlcolor{light-gray}\hl{\texttt{#1}}\endgroup}} % Shortcut for code font in text
+\soulregister{\code}{1}
 
 %% Status of writing:
-\newcommand{\TODO}{\textcolor{red}{TODO}}   		   % To Do command
-\newcommand{\ENGLISH}{\textcolor{green}{ENGLISH}}      % Writing To Be Checked by someone who knows English grammar
-\newcommand{\SUPERVISOR}{\textcolor{blue}{SUPERVISOR}} % Writing To Be Checked by Supervisor (Tomas Oberhuber)
+\newcommand{\TODO}{\textcolor{red}{TODO}}   		   % To-Do command
+\newcommand{\TO}{\textcolor{nvidia}{TO}} 			   % Writing to-be checked by the supervisor (Tomas Oberhuber)
 
 
 %%% Constants
@@ -78,20 +147,18 @@
 \newcommand{\titleEN}{Parallel LU Decomposition for the GPU} % English title of the project
 \newcommand{\paperAuthor}{Bc. Lukáš Čejka}   				 % Name and surname, including academic titles
 \newcommand{\supervisor}{doc. Ing. Tomáš Oberhuber, Ph.D.} 	 % Name and surname of supervisor, including academic titles
-\newcommand{\supervisorWorkspace}{\ksi, \fjfi, \cvut} 			 % Workplace of supervisor
+\newcommand{\supervisorWorkspace}{\ksi, \fjfi, \cvut} 		 % Workplace of supervisor
 
-% TODO: Can Klinkovsky be considered a consultant?
 \newcommand{\consultant}{--} 								 % Consultant's name, surname and academic titles, if I have a consultant
-\newcommand{\consultantWorkspace}{--} 							 % Consultant's workplace, if I have a consultant
+\newcommand{\consultantWorkspace}{--} 						 % Consultant's workplace, if I have a consultant
 
-\newcommand{\yearSubmitted}{2022}  									 % Year of handing in the thesis (not the academic years)
+\newcommand{\yearSubmitted}{2022}  							 % Year of handing in the thesis (not the academic years)
 \newcommand{\place}{Praze} 									 % City of studying
 
-% TODO: Fill in the following at the end
-\newcommand{\keywordCZ}{Klíčová slova}   						 % Enter 5 keywords max. in Czech
-\newcommand{\keywordEN}{Key words}       						 % Enter 5 keywords max. in English (translations of the Czech keywords)
-\newcommand{\abstractCZ}{Popis práce česky}    				 % Abstract in Czech (roughly 7 sentences, at least 80 words)
-\newcommand{\abstractEN}{Description of the project in English} % Abstract in English (translation of the Czech abstract)
+\newcommand{\keywordCZ}{LU dekompozice, Grafická karta (GPU), Compute Unified Device Architecture (CUDA), Nvidia, C++, Výkonnostní test, High Performance Computing (HPC), Porovnání výkonu, Porovnání přesnosti, Optimalizace, Template Numerical Library (TNL)}
+\newcommand{\keywordEN}{LU decomposition, Graphics Processing Unit (GPU), Compute Unified Device Architecture (CUDA), Nvidia C++, Benchmark, High Performance Computing (HPC), Performance comparison, Accuracy comparison, Optimization, Template Numerical Library (TNL)}
+\newcommand{\abstractCZ}{Tento projekt se zaměřuje na paralelizaci metody LU dekompozice na grafických kartách (GPU). Mezi hlavni cíle této práce patří nastudování architektury a softwarové vrstvy GPU od společnosti Nvidia za účelem poskytnutí efektivního řešení rozkladu a porovnat jej s implementací na procesoru (CPU). Za tímto účelem byl implementován projekt obsahující funkcionální a výkonnostní testy. Výkonnostní testy byly spuštěny na sadě matic s různými vlastnostmi na moderním výpočetním systému. Výsledky výkonnostních testů byly analyzovány a následně byla doporučena implementace pro obecné použití.}
+\newcommand{\abstractEN}{The main focus of this project revolves around the parallelization of the LU decomposition method on the Graphics Processing Unit (GPU). Specifically, the study of the architecture and software layer of Nvidia GPUs in order to deliver an effective decomposition solution and compare it to the CPU implementation. To facilitate this, a project containing unit tests and a benchmarking framework was implemented. The benchmarks were run on a set of curated matrices with varying characteristics on a state-of-the-art compute cluster. The results of the benchmarks were analyzed and an implementation was recommended for general use.}
 
 % Declaration in Czech
 \newcommand{\declarationCZ}{Prohlašuji, že jsem svůj výzkumný úkol vypracoval samostatně a použil jsem pouze podklady (literaturu, projekty, SW atd.) uvedené v přiloženém seznamu.}
@@ -100,10 +167,10 @@
 \newcommand{\declarationEN}{I declare that I have carried out my research project independently and I have used only the materials (literature, projects, software, etc.) listed in the bibliography.}
 
 % Acknowledgement in Czech
-\newcommand{\acknowledgementCZ}{Chtěl bych poděkovat doc. Ing. Tomáš Oberhuber, Ph.D. za vedení mé práce a za podnětné návrhy, které ji obohatily.}
+\newcommand{\acknowledgementCZ}{Chtěl bych poděkovat doc. Ing. Tomáši Oberhuberovi, Ph.D. za vedení mé práce a za podnětné návrhy, které ji obohatily. Poděkování patří také zpřístupnění výpočetní infrastruktury projektu financovaného OP VVV CZ.02.1.01/0.0/0.0/16\_019/0000765 ``Výzkumné centrum informatiky''.}
 
 % Acknowledgement in English (translation of the Czech acknowledgement)
-\newcommand{\acknowledgementEN}{I would like to thank doc. Ing. Tomas Oberhuber, Ph.D. for supervising my project and for the inspiring proposals that enriched it.}
+\newcommand{\acknowledgementEN}{I would like to thank doc. Ing. Tomas Oberhuber, Ph.D. for supervising my project and for the inspiring proposals that enriched it. The access to the computational infrastructure of the OP VVV funded project CZ.02.1.01/0.0/0.0/16\_019/0000765 ``Research Center for Informatics'' is also gratefully acknowledged.}
 
 
 
@@ -151,7 +218,7 @@
    }
 \end{center}
 
-\clearpage{\pagestyle{empty}\cleardoublepage} % prázdná stránka za tou "titulní", bez čísla
+\clearpage{\pagestyle{empty}\cleardoublepage} % Empty page after the title page - no numbering
 
 
 
@@ -162,8 +229,8 @@
 \newpage  			  % DO NOT TOUCH!
 \thispagestyle{empty} % DO NOT TOUCH!
 
-% Task paper scanned as a 2-page PDF:
-\includepdf[pages={1,2}]{resources/zadani_cele.pdf} % TODO: Replace with the correct paper
+% Task paper scanned as a 1-page PDF:
+\includepdf[pages={1}]{resources/vyz-zadani-cejka.pdf}
 
 
 
@@ -188,8 +255,8 @@
 \declarationEN
 \selectlanguage{czech}%
 
-\vspace{2em}  									 							  % DO NOT TOUCH!
-\hspace{-0.5em}\begin{tabularx}{\textwidth}{X c} 							  % DO NOT TOUCH!
+\vspace{2em}  									 							    % DO NOT TOUCH!
+\hspace{-0.5em}\begin{tabularx}{\textwidth}{X c} 							    % DO NOT TOUCH!
 V \place\ dne .................... &........................................ \\ % DO NOT TOUCH!
 	& \paperAuthor
 \end{tabularx} % DO NOT TOUCH!
@@ -206,7 +273,7 @@ V \place\ dne .................... &........................................ \\ 
 
 \tb{Poděkování}
 
-\vspace{1em} % Vertical space. % DO NOT TOUCH!
+\vspace{1em} 				% Vertical space. % DO NOT TOUCH!
 \acknowledgementCZ
 
 \selectlanguage{american}%
@@ -214,11 +281,11 @@ V \place\ dne .................... &........................................ \\ 
 \tb{Acknowledgment}
 
 \selectlanguage{czech}%
-\vspace{1em} % Vertical space. % DO NOT TOUCH!
+\vspace{1em} 				% Vertical space. % DO NOT TOUCH!
 \acknowledgementEN
 \begin{flushright}
 \paperAuthor
-\end{flushright}  % Acknowledgement page ends here
+\end{flushright}  			% Acknowledgement page ends here
 
 
 
@@ -276,15 +343,15 @@ V \place\ dne .................... &........................................ \\ 
 %|         The PAPER ITSELF begins here                 |
 %--------------------------------------------------------
 
-\include{preface}
+\include{introduction}
 
 \include{ch1_theory}
 \include{ch2_implementation}
-\include{ch3_benchmark-results}
+\include{ch3_comparing-decomposition-implementations}
 
 \include{conclusion}
 
-\include{bibliografie}
+\printbibliography
 
 \include{attachments}
 

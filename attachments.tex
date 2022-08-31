@@ -2,5 +2,128 @@
 \addcontentsline{toc}{chapter}{Attachments}	% DO NOT TOUCH!
 \appendix 								 	% DO NOT TOUCH!
 
-\chapter{Title of first attachment}
-Write the text for your first attachment here, or insert it using: \texttt{\textbackslash input\{attachment\_A.tex\}}.
+
+\chapter{Crout Method Implementation for the CPU}\label{Attachment:crout-method-implementation-CPU}
+The Crout method implementation for the CPU using matrices $ \mathbb{L} $ and $ \mathbb{U} $ is shown in Listing~\ref{Listing:crout-method-implementation-CPU-LU} and using matrix $ \mathbb{Z} $ in Listing~\ref{Listing:crout-method-implementation-CPU-Z}.
+\begin{lstlisting}[caption={Implementation of the Crout method on the CPU using matrices $ \mathbb{L} $ and $ \mathbb{U} $. All matrix and variable types are obtained from template arguments of the method. Taken from the Decomposition project repository on GitLab\protect\footref{Footnote:decomposition-project-gitlab-url}.},label={Listing:crout-method-implementation-CPU-LU}]
+	template< typename Matrix1, typename Matrix2, typename Matrix3 >
+	void CroutMethod::decompose( Matrix1& A, Matrix2& L, Matrix3& U )
+	{
+		using RealType  = typename Matrix1::RealType;
+		using IndexType = typename Matrix1::IndexType;
+		
+		IndexType num_rows = A.getRows();
+		IndexType num_cols = A.getColumns();
+		
+		TNL_ASSERT_EQ( num_rows, num_cols, "Matrix A must be a square matrix!" );
+		
+		IndexType i, j, k;
+		RealType sum = 0;
+		
+		for( j = 0; j < num_rows; ++j )	{
+			for( i = j; i < num_rows; ++i ) {
+				sum = 0;
+				for( k = 0; k < j; ++k ) {
+					sum = sum + L.getElement( i, k ) * U.getElement( k, j );
+				}
+				
+				L.setElement( i, j, A.getElement( i, j ) - sum );
+			}
+			
+			for( i = j; i < num_rows; ++i ) {
+				TNL_ASSERT( L.getElement( j, j ) != 0, std::cerr << "L( " << i << ", " << j << " ) = 0. Cannot divide by 0." << std::endl );
+				sum = 0;
+				for( k = 0; k < j; ++k ) {
+					sum = sum + L.getElement( j, k ) * U.getElement( k, i );
+				}
+				
+				U.setElement( j, i, ( A.getElement( j, i ) - sum ) / L.getElement( j, j ) );
+			}
+		}	
+	}
+\end{lstlisting}
+
+\begin{lstlisting}[caption={Implementation of the Crout method on the CPU using matrix $ \mathbb{Z} $. Taken from the Decomposition project repository on GitLab\protect\footref{Footnote:decomposition-project-gitlab-url}.},label={Listing:crout-method-implementation-CPU-Z}]
+	template< typename Matrix1, typename Matrix2 >
+	void CroutMethod::decompose( Matrix1& A, Matrix2& Z )
+	{
+		using RealType  = typename Matrix1::RealType;
+		using IndexType = typename Matrix1::IndexType;
+		
+		IndexType num_rows = A.getRows();
+		IndexType num_cols = A.getColumns();
+		
+		TNL_ASSERT_EQ( num_rows, num_cols, "Matrix A must be a square matrix!" );
+		
+		IndexType i, j, k;
+		RealType sum = 0;
+		
+		for( j = 0; j < num_rows; ++j )	{
+			for( i = j; i < num_rows; ++i ) {
+				sum = 0;
+				for( k = 0; k < j; ++k ) {
+					sum = sum + Z.getElement( i, k ) * Z.getElement( k, j );
+				}
+				
+				Z.setElement( i, j, A.getElement( i, j ) - sum );
+			}
+			
+			for( i = j; i < num_rows; ++i ) {
+				if( j == i ) continue;
+				
+				TNL_ASSERT( Z.getElement( j, j ) != 0, std::cerr << "Z( " << j << ", " << j << " ) = 0. Cannot divide by 0." << std::endl );
+				sum = 0;
+				for( k = 0; k < j; ++k ) {
+					sum = sum + Z.getElement( j, k ) * Z.getElement( k, i );
+				}
+				
+				Z.setElement( j, i, ( A.getElement( j, i ) - sum ) / Z.getElement( j, j ) );
+			}
+		}
+	}
+\end{lstlisting}
+
+
+
+
+\chapter{Random Dense Matrix Generator Script}\label{Attachment:random-dense-matrix-generator}
+The Python script used to generate random dense matrices that were later decomposed in the benchmark can be seen in Listing~\ref{Listing:random-dense-matrix-generator}.
+\begin{lstlisting}[language=Python,caption={Python script for generating random dense matrices in the \emph{SuitSparse Matrix Collection} \cite{Davis2011} format. On line~\ref{Line:eliminate-zeros-from-dense-matrix} it can be seen that any zeros were incremented which was done to assure that the matrices produced would be both strongly regular and composed only of nonzero elements.},label={Listing:random-dense-matrix-generator},escapechar=@]
+import numpy as np
+
+num_mtx_files = 3
+num_rows_cols_range = [2000, 5000]
+elements_range = [-1000, 1000]
+
+mtx_files = np.random.randint(low=num_rows_cols_range[0], high=num_rows_cols_range[1], size=num_mtx_files)
+
+for num_rows_cols in mtx_files:
+	dense_mtx_filename = f"Cejka{num_rows_cols}.mtx"
+	
+	header_lines = [
+	"%%MatrixMarket matrix coordinate real general",
+	"%----------------------------------------------------------------------------",
+	"% Cejka Dense Matrix Collection, Lukas Cejka",
+	"% Insert URL here",
+	f"% name: Cejka/{dense_mtx_filename}",
+	"% date: 2022",
+	"% author: L. Cejka",
+	"% kind: Random Dense Matrix",
+	"%----------------------------------------------------------------------------",
+	]
+	header_lines = [line + "\n" for line in header_lines]
+	
+	mtx_info = f"{num_rows_cols} {num_rows_cols} {num_rows_cols*num_rows_cols}\n"
+	
+	rand_floats = np.random.uniform(low=elements_range[0], high=elements_range[1], size=(num_rows_cols*num_rows_cols))
+	rand_floats = [flt+1 if flt == 0 else flt for flt in rand_floats] @\label{Line:eliminate-zeros-from-dense-matrix}@
+	rand_floats = [str(flt) + "\n" for flt in rand_floats]
+	
+	
+	with open(dense_mtx_filename, 'w') as f:
+		f.writelines(header_lines)
+		f.write(mtx_info)
+		for col in range(1, num_rows_cols):
+			for row in range(1, num_rows_cols):
+				f.write(f"{row} {col} {rand_floats[(col-1)*num_rows_cols + row - 1]}")
+\end{lstlisting}
