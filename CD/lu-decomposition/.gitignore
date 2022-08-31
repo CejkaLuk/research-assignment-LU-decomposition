@@ -1,0 +1,22 @@
+/Debug
+/Release
+src/Benchmark/scripts/general
+src/Benchmark/scripts/mtx-matrices
+src/Benchmark/scripts/log-files
+
+**.log
+**.html
+**__pycache__
+assertion_error_output*.txt
+
+# VSCode
+/.vscode
+
+# Editors
+*.orig
+*.bak
+*.backup
+*.swp
+
+# GDB
+.gdb_history

@@ -1,0 +1,253 @@
+#!/bin/bash
+
+# exit as soon as there is an error
+set -e
+
+# get the root directory (i.e. the directory where this script is located)
+ROOT_DIR="$( builtin cd -P "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
+BUILD="Release"
+BUILD_JOBS=""
+VERBOSE=""
+OFFLINE_BUILD="no"
+INSTALL="yes"
+PREFIX=${HOME}/.local
+CMAKE="cmake"
+CMAKE_ONLY="no"
+COMPILER="gcc"
+
+WITH_MPI="yes"
+WITH_CUDA="yes"
+WITH_CUDA_ARCH="auto"
+WITH_OPENMP="yes"
+WITH_GMP="no"
+WITH_CI_FLAGS="no"
+WITH_SYSTEM_GTEST="no"
+
+# flags affecting only tests
+RUN_TESTS="yes"   # whether to run tests if they were compiled (coverage script sets it to no)
+TESTS_JOBS="4"
+
+# targets
+BUILD_BENCHMARK="no"
+BUILD_TESTS="no"
+
+
+function print_usage()
+{
+    cat << EOF
+usage: $0 [options] [target ...]
+
+By default, the script does not select any target. Build targets available for
+selection are listed below. If the --install option is used, the Decomposition header
+files as well as the selected targets will be installed into the directory
+specified by the --prefix option.
+
+Targets:
+    all             Special target which includes all other targets.
+    benchmark      Compile the 'src/Benchmark' directory.
+    tests           Compile unit tests in the 'src/UnitTests' directory.
+
+General options:
+    --help                                Write this help list and exit.
+    --verbose                             Enables verbose build.
+    --install=yes/no                      Enables the installation of Decomposition files. '$INSTALL' by default.
+    --prefix=PATH                         Prefix for the installation directory. '$HOME/.local' by default.
+
+Options affecting all targets:
+    --offline-build=yes/no                Disables online updates during the build. '$OFFLINE_BUILD' by default.
+    --build=Debug/Release                 Build type.
+    --build-jobs=NUM                      Number of processes to be used for the build. It is set to the number of available CPU cores by default.
+    --cmake=CMAKE                         Path to the cmake command. '$CMAKE' by default.
+    --cmake-only=yes/no                   Run only the cmake command, don't actually build anything. '$CMAKE_ONLY' by default.
+    --compiler=gcc/clang/icc              Selects the compiler to use. '$COMPILER' by default.
+    --with-mpi=yes/no                     Enables MPI. '$WITH_MPI' by default (OpenMPI required).
+    --with-cuda=yes/no                    Enables CUDA. '$WITH_CUDA' by default (CUDA Toolkit is required).
+    --with-cuda-arch=all/auto/3.0/3.5/... Chooses CUDA architecture. '$WITH_CUDA_ARCH' by default.
+    --with-openmp=yes/no                  Enables OpenMP. '$WITH_OPENMP' by default.
+    --with-gmp=yes/no                     Enables the wrapper for GNU Multiple Precision Arithmetic Library. '$WITH_GMP' by default.
+
+Options for the 'tests' and 'matrix-tests' targets:
+    --run-tests=yes/no                    Runs unit tests if they were compiled. '$RUN_TESTS' by default.
+    --tests-jobs=NUM                      Number of processes to be used for the unit tests. It is $TEST_JOBS by default.
+    --with-system-gtest=yes/no            Use GTest installed in the local system and do not download the latest version. '$WITH_SYSTEM_GTEST' by default.
+EOF
+}
+
+# handle --help first
+for option in "$@"; do
+    if [[ "$option" == "--help" ]]; then
+        print_usage
+        exit 1
+    fi
+done
+
+# handle options
+for option in "$@"; do
+    case "$option" in
+        --build=*             ) BUILD="${option#*=}" ;;
+        --build-jobs=*        ) BUILD_JOBS="${option#*=}" ;;
+        --verbose             ) VERBOSE="VERBOSE=1" ;;
+        --offline-build       ) OFFLINE_BUILD="yes" ;;
+        --install=*           ) INSTALL="${option#*=}" ;;
+        --install             ) INSTALL="yes" ;;
+        --prefix=*            ) PREFIX="${option#*=}" ;;
+        --cmake=*             ) CMAKE="${option#*=}" ;;
+        --cmake-only=*        ) CMAKE_ONLY="${option#*=}" ;;
+        --compiler=*          ) COMPILER="${option#*=}" ;;
+        --with-mpi=*          ) WITH_MPI="${option#*=}" ;;
+        --with-cuda=*         ) WITH_CUDA="${option#*=}" ;;
+        --with-cuda-arch=*    ) WITH_CUDA_ARCH="${option#*=}";;
+        --with-openmp=*       ) WITH_OPENMP="${option#*=}" ;;
+        --with-gmp=*          ) WITH_GMP="${option#*=}" ;;
+        --run-tests=*         ) RUN_TESTS="${option#*=}" ;;
+        --tests-jobs=*        ) TESTS_JOBS="${option#*=}" ;;
+        --with-ci-flags=*     ) WITH_CI_FLAGS="${option#*=}" ;;
+        --with-system-gtest=* ) WITH_SYSTEM_GTEST="${option#*=}" ;;
+        -*                    )
+            echo "Unknown option $option. Use --help for more information." >&2
+            exit 1
+            ;;
+        *) break ;;
+    esac
+    shift
+done
+
+# check the build type
+if [[ ! "Release Debug RelWithDebInfo" =~ "$BUILD" ]]; then
+    echo "Unknown build type: $BUILD. The available build types are: Release, Debug, RelWithDebInfo." >&2
+    exit 1
+fi
+
+# handle targets
+for target in "$@"; do
+    case "$target" in
+        all)
+            BUILD_BENCHMARK="yes"
+            BUILD_TESTS="yes"
+            ;;
+        benchmark)     BUILD_BENCHMARK="yes" ;;
+        tests)         BUILD_TESTS="yes" ;;
+        *)
+            echo "Unknown target $target. The available targets are: all, benchmark, tests." >&2
+            echo "Use --help for more information." >&2
+            exit 1
+    esac
+    shift
+done
+
+if [[ "$COMPILER" == "gcc" ]]; then
+   export CXX=g++
+   export CC=gcc
+   export CUDA_HOST_COMPILER=g++
+elif [[ "$COMPILER" == "clang" ]]; then
+   export CXX=clang++
+   export CC=clang
+   export CUDA_HOST_COMPILER=clang++
+elif [[ "$COMPILER" == "icc" ]]; then
+   export CXX=icpc
+   export CC=icc
+   export CUDA_HOST_COMPILER=icpc
+else
+   echo "Error: the compiler '$COMPILER' is not supported. The only options are 'gcc', 'clang' and 'icc'." >&2
+   exit 1
+fi
+
+if [[ ! $(command -v cmake) ]]; then
+   echo "Error: cmake is not installed. See http://www.cmake.org/download/" >&2
+   exit 1
+fi
+
+if [[ $(command -v ninja) ]]; then
+   generator=Ninja
+   make=ninja
+   check_file="build.ninja"
+else
+   generator="Unix Makefiles"
+   make=make
+   check_file="Makefile"
+fi
+
+cmake_command=(
+   ${CMAKE} ${ROOT_DIR}
+         -G "${generator}"
+         -DCMAKE_BUILD_TYPE=${BUILD}
+         -DCMAKE_INSTALL_PREFIX=${PREFIX}
+         -DOFFLINE_BUILD=${OFFLINE_BUILD}
+         -DWITH_CUDA=${WITH_CUDA}
+         -DWITH_CUDA_ARCH=${WITH_CUDA_ARCH}
+         -DWITH_OPENMP=${WITH_OPENMP}
+         -DWITH_MPI=${WITH_MPI}
+         -DWITH_GMP=${WITH_GMP}
+         -DWITH_CI_FLAGS=${WITH_CI_FLAGS}
+         -DWITH_SYSTEM_GTEST=${WITH_SYSTEM_GTEST}
+         -DBUILD_BENCHMARK=${BUILD_BENCHMARK}
+         -DBUILD_TESTS=${BUILD_TESTS}
+)
+
+# Skip running cmake if it was already run and the cmake command is the same.
+# The build system (e.g. make) will call it automatically if necessary (e.g.
+# when some CMakeLists.txt changes).
+if [[ -f ".cmake_command" ]]; then
+   last_cmake_command=$(cat ".cmake_command" 2>/dev/null)
+else
+   last_cmake_command=""
+fi
+if [[ ! -f "$check_file" ]] || [[ "$last_cmake_command" != "${cmake_command[@]}" ]]; then
+   echo "Configuring ${BUILD} Decomposition ..."
+   "${cmake_command[@]}"
+   echo -n "${cmake_command[@]}" > ".cmake_command"
+fi
+
+if [[ ${CMAKE_ONLY} == "yes" ]]; then
+   exit 0
+fi
+
+# get the number of physical cores present on the system, even with multiple NUMA nodes
+# see https://unix.stackexchange.com/a/279354
+SYSTEM_CORES=$(lscpu --all --parse=CORE,SOCKET | grep -Ev "^#" | sort -u | wc -l)
+
+if [[ "$make" == "make" ]]; then
+   if [[ -n ${BUILD_JOBS} ]]; then
+      # override $MAKEFLAGS from parent environment
+      export MAKEFLAGS=-j${BUILD_JOBS}
+   elif [[ -z ${MAKEFLAGS} ]]; then
+      # $BUILD_JOBS and $MAKEFLAGS are not set => set default value
+      BUILD_JOBS=$SYSTEM_CORES
+      export MAKEFLAGS=-j${BUILD_JOBS}
+   fi
+else
+   if [[ -z ${BUILD_JOBS} ]]; then
+      BUILD_JOBS=$SYSTEM_CORES
+   fi
+   make="$make -j$BUILD_JOBS"
+fi
+
+if [[ -n ${BUILD_JOBS} ]]; then
+   echo "Building ${BUILD} Decomposition using $BUILD_JOBS processors ..."
+else
+   # number of processors is unknown - it is encoded in $MAKEFLAGS from parent environment
+   echo "Building ${BUILD} Decomposition ..."
+fi
+
+if [[ "$INSTALL" == "yes" ]]; then
+   # install implies all
+   make_target="install"
+else
+   make_target="all"
+fi
+
+# make expects VERBOSE=1, ninja expects -v
+if [[ "$make" != "make" ]] && [[ "$VERBOSE" ]]; then
+   VERBOSE="-v"
+fi
+
+if ! $make ${VERBOSE} $make_target; then
+   exit 1
+fi
+
+if [[ ${BUILD_TESTS} == "yes" ]]; then
+   if [[ ${RUN_TESTS} == "yes" ]]; then
+      OMP_NUM_THREADS=${TESTS_JOBS} CTEST_PARALLEL_LEVEL=${TESTS_JOBS} CTEST_OUTPUT_ON_FAILURE=1 $make test
+   fi
+fi
