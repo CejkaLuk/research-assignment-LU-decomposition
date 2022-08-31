@@ -11,11 +11,10 @@
 \usepackage{listings} 			 % Code formatting package
 
 % Fonts:
-\usepackage[hidelinks]{hyperref} % Hide square around URL link.
 \usepackage{amsmath}  			 % Advanced mathematic package
 \usepackage{xcolor}    			 % Colorful text
 \usepackage{soul}				 % Text fonts syllable by syllable - used for in-text codifying
-\usepackage[varg]{txfonts}		 % Times New Roman fonts and math alphabets, for example, provides \mathbb{}.
+\usepackage[varg]{txfonts}		 % Times New Roman fonts and math alphabets, for example, provides \mathbb{}
 
 % Graphics:
 \usepackage{graphicx} 			 % Insert raster graphic files (PNG etc.)
@@ -26,7 +25,7 @@
 \usepackage{subcaption}			 % Sub-captions of figures, tables, etc. 
 \usepackage{nicematrix, tikz}	 % Visual representation of matrices, graphs etc. - 'nicematrix' is experimental
 \usetikzlibrary{plotmarks, positioning, fit}
-\usetikzlibrary{decorations.pathreplacing, matrix, calc} % EXPERIMENTAL
+\usetikzlibrary{decorations.pathreplacing, matrix, calc, shapes.arrows}
 \usepackage{pgfplots} 			 % For visualizations, graphics, etc.
 \pgfplotsset{compat=1.3}		 % Use pgfplots version 1.3 specifically
 
@@ -46,10 +45,15 @@
 \DeclareFieldFormat{labelnumberwidth}{\mkbibbrackets{#1}} % Square brackets around numbers in the bibliography
 \setcounter{biburllcpenalty}{7000}						  % Insert breakpoints after lowercase letters in URLs in the bibliography
 \setcounter{biburlucpenalty}{8000}						  % Insert breakpoints after uppercase letters in URLs in the bibliography
+\usepackage{csquotes}									  % Ensure that quoted texts are typeset according to the rules of the main language
+\usepackage{xurl}										  % URL formatting: better linebreaks in footnotes, etc.
 
 % Tables:
 \usepackage{tabularx}			 % Advanced table options
 \usepackage{colortbl} 			 % Table cell color
+
+% Fonts (must be mentioned last to avoid warnings in the log)
+\usepackage[hidelinks]{hyperref} % Hide square around URL link
 
 %%% Document settings:
 % TODO: Play around with the following if the formatting of pages turns out weird
@@ -58,11 +62,13 @@
 \brokenpenalty=9500    % Prohibit page breaks after a line that has a split word at the end
 
 \geometry{verbose,tmargin=4cm,bmargin=3cm,lmargin=3cm,rmargin=2cm,headheight=0.8cm,headsep=1cm,footskip=0.5cm} % Setup from bachelor thesis - provides more space for the content on a page
-\raggedbottom 		   % All pages the height of the text on that page. No extra vertical space is added.
+\raggedbottom 		   % All pages the height of the text on that page. No extra vertical space is added
 \pagenumbering{arabic} % Page numbering in Arabic numerals
 \pagestyle{plain}      % Page numbering at the bottom center
 
 \parindent=0pt 		   % Indentation of the 1st line of the paragraph
+
+\setlength{\emergencystretch}{17.5pt} % Allow compiler to create more spaces between words to avoid overflow of text
 
 
 %%% Custom colors:
@@ -110,19 +116,19 @@
 	morekeywords={gridDim.x},
 	morekeywords={__shared__},
 	morekeywords={dim3},
-	alsoletter={.}				% Make the font be applied for dots
+	alsoletter={.}			   % Make the font be applied for dots
 }
 
 
 %%% Custom commands:
-\newcommand{\ti}{\textit} 								  % Shortcut for cursive font
-\newcommand{\tb}{\textbf} 								  % Shortcut for bold fond
-
-\newcommand{\code}[1]{\colorbox{light-gray}{\texttt{#1}}}
+\newcommand{\ti}{\textit} 								  									   % Shortcut for cursive font
+\newcommand{\tb}{\textbf} 								  									   % Shortcut for bold fond
+\DeclareRobustCommand{\code}[1]{{\begingroup\sethlcolor{light-gray}\hl{\texttt{#1}}\endgroup}} % Shortcut for code font in text
+\soulregister{\code}{1}
 
 %% Status of writing:
-\newcommand{\TODO}{\textcolor{red}{TODO}}   		   % To Do command
-\newcommand{\TO}{\textcolor{nvidia}{TO}} 			   % Writing To Be Checked by Supervisor (Tomas Oberhuber)
+\newcommand{\TODO}{\textcolor{red}{TODO}}   		   % To-Do command
+\newcommand{\TO}{\textcolor{nvidia}{TO}} 			   % Writing to-be checked by the supervisor (Tomas Oberhuber)
 
 
 %%% Constants
@@ -151,7 +157,7 @@
 
 \newcommand{\keywordCZ}{LU dekompozice, Grafická karta (GPU), Compute Unified Device Architecture (CUDA), Nvidia, C++, Výkonnostní test, High Performance Computing (HPC), Porovnání výkonu, Porovnání přesnosti, Optimalizace, Template Numerical Library (TNL)}
 \newcommand{\keywordEN}{LU decomposition, Graphics Processing Unit (GPU), Compute Unified Device Architecture (CUDA), Nvidia C++, Benchmark, High Performance Computing (HPC), Performance comparison, Accuracy comparison, Optimization, Template Numerical Library (TNL)}
-\newcommand{\abstractCZ}{Tento projekt se hlavně zaměřuje na paralelizaci metody LU dekompozice na grafickch kartách (GPU). Mezi hlavni cíle této práce patří nastudování architektury a softwarové vrstvy GPU od společnosti Nvidia za účelem poskytnutí efektivního řešení rozkladu a porovnat jej s implementací na procesoru (CPU). Za tímto účelem byl implementován projekt obsahující funkcionální a výkonnostní testy. Výkonnostní testy byly spuštěny na sadě matic s různými vlastnostmi na moderním výpočetním systému. Výsledky výkonnostních testů byly analyzovány a následně byla doporučena implementace pro obecné použití.}
+\newcommand{\abstractCZ}{Tento projekt se zaměřuje na paralelizaci metody LU dekompozice na grafických kartách (GPU). Mezi hlavni cíle této práce patří nastudování architektury a softwarové vrstvy GPU od společnosti Nvidia za účelem poskytnutí efektivního řešení rozkladu a porovnat jej s implementací na procesoru (CPU). Za tímto účelem byl implementován projekt obsahující funkcionální a výkonnostní testy. Výkonnostní testy byly spuštěny na sadě matic s různými vlastnostmi na moderním výpočetním systému. Výsledky výkonnostních testů byly analyzovány a následně byla doporučena implementace pro obecné použití.}
 \newcommand{\abstractEN}{The main focus of this project revolves around the parallelization of the LU decomposition method on the Graphics Processing Unit (GPU). Specifically, the study of the architecture and software layer of Nvidia GPUs in order to deliver an effective decomposition solution and compare it to the CPU implementation. To facilitate this, a project containing unit tests and a benchmarking framework was implemented. The benchmarks were run on a set of curated matrices with varying characteristics on a state-of-the-art compute cluster. The results of the benchmarks were analyzed and an implementation was recommended for general use.}
 
 % Declaration in Czech
@@ -161,10 +167,10 @@
 \newcommand{\declarationEN}{I declare that I have carried out my research project independently and I have used only the materials (literature, projects, software, etc.) listed in the bibliography.}
 
 % Acknowledgement in Czech
-\newcommand{\acknowledgementCZ}{Chtěl bych poděkovat doc. Ing. Tomáš Oberhuber, Ph.D. za vedení mé práce a za podnětné návrhy, které ji obohatily. Dále bych rád poděkoval Ing. Pavlu Strachotovi, Ph.D., a Ing. Jakubu Klinkovskému za pomoc s clusterem HELIOS na FJFI ČVUT Praha. Poděkování patří také zpřístupnění výpočetní infrastruktury projektu financovaného OP VVV CZ.02.1.01/0.0/0.0/16\_019/0000765 ``Výzkumné centrum informatiky''.}
+\newcommand{\acknowledgementCZ}{Chtěl bych poděkovat doc. Ing. Tomáši Oberhuberovi, Ph.D. za vedení mé práce a za podnětné návrhy, které ji obohatily. Poděkování patří také zpřístupnění výpočetní infrastruktury projektu financovaného OP VVV CZ.02.1.01/0.0/0.0/16\_019/0000765 ``Výzkumné centrum informatiky''.}
 
 % Acknowledgement in English (translation of the Czech acknowledgement)
-\newcommand{\acknowledgementEN}{I would like to thank doc. Ing. Tomas Oberhuber, Ph.D. for supervising my project and for the inspiring proposals that enriched it. Furthermore, I would like to acknowledge Ing. Pavel Strachota, Ph.D., and Ing. Jakub Klinkovský for their assistance with the HELIOS cluster at FJFI CTU Prague. The access to the computational infrastructure of the OP VVV funded project CZ.02.1.01/0.0/0.0/16\_019/0000765 ``Research Center for Informatics'' is also gratefully acknowledged.}
+\newcommand{\acknowledgementEN}{I would like to thank doc. Ing. Tomas Oberhuber, Ph.D. for supervising my project and for the inspiring proposals that enriched it. The access to the computational infrastructure of the OP VVV funded project CZ.02.1.01/0.0/0.0/16\_019/0000765 ``Research Center for Informatics'' is also gratefully acknowledged.}
 
 
 
@@ -223,7 +229,7 @@
 \newpage  			  % DO NOT TOUCH!
 \thispagestyle{empty} % DO NOT TOUCH!
 
-% Task paper scanned as a 2-page PDF:
+% Task paper scanned as a 1-page PDF:
 \includepdf[pages={1}]{resources/vyz-zadani-cejka.pdf}
 
 
@@ -249,8 +255,8 @@
 \declarationEN
 \selectlanguage{czech}%
 
-\vspace{2em}  									 							  % DO NOT TOUCH!
-\hspace{-0.5em}\begin{tabularx}{\textwidth}{X c} 							  % DO NOT TOUCH!
+\vspace{2em}  									 							    % DO NOT TOUCH!
+\hspace{-0.5em}\begin{tabularx}{\textwidth}{X c} 							    % DO NOT TOUCH!
 V \place\ dne .................... &........................................ \\ % DO NOT TOUCH!
 	& \paperAuthor
 \end{tabularx} % DO NOT TOUCH!
@@ -267,7 +273,7 @@ V \place\ dne .................... &........................................ \\ 
 
 \tb{Poděkování}
 
-\vspace{1em} % Vertical space. % DO NOT TOUCH!
+\vspace{1em} 				% Vertical space. % DO NOT TOUCH!
 \acknowledgementCZ
 
 \selectlanguage{american}%
@@ -275,11 +281,11 @@ V \place\ dne .................... &........................................ \\ 
 \tb{Acknowledgment}
 
 \selectlanguage{czech}%
-\vspace{1em} % Vertical space. % DO NOT TOUCH!
+\vspace{1em} 				% Vertical space. % DO NOT TOUCH!
 \acknowledgementEN
 \begin{flushright}
 \paperAuthor
-\end{flushright}  % Acknowledgement page ends here
+\end{flushright}  			% Acknowledgement page ends here
 
 
 
@@ -341,7 +347,7 @@ V \place\ dne .................... &........................................ \\ 
 
 \include{ch1_theory}
 \include{ch2_implementation}
-\include{ch3_benchmark-results}
+\include{ch3_comparing-decomposition-implementations}
 
 \include{conclusion}
 
