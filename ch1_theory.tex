@@ -80,7 +80,7 @@ Nvidia GPUs, on the other hand, are engineered to have many smaller controlling 
 		& \multicolumn{1}{>{\arraybackslash\scriptsize}m{2.72cm}|}{7.8}
 		& \multicolumn{1}{>{\arraybackslash\scriptsize}m{2.72cm}|}{9.7}\\
 		\hline
-		Peak Tensor TFLOPS & NA & 51 & 125 & 312/624$^3$\\
+		Peak Tensor TFLOPS & NA & 51 & 125 & 312/624\\
 		\hline
 		\rowcolor{lightnvidia}\multicolumn{1}{|>{\arraybackslash\bfseries\scriptsize}m{2.72cm}|}{Memory Bandwidth}
 		& \multicolumn{1}{>{\arraybackslash\scriptsize}m{2.72cm}|}{256 GB/s}
@@ -132,9 +132,9 @@ The Compute Unified Device Architecture (CUDA) is a programming model, sometimes
 \subsection{Introductory Terminology}\label{Subsection:theory-CUDA-introductory-terminology}
 CUDA introduces many unique concepts that come with their own naming scheme. This section will list and explain some basic terminology that will be used throughout the project \cite{Ruetsch2008}:
 \begin{itemize}
-	\item \textbf{Host} - Central Processing Unit (CPU) and its memory. The host provides data to GPU and instructs it to execute various instructions.
+	\item \textbf{Host} - Central Processing Unit (CPU) and its memory. The host provides data to the GPU and instructs it to execute various instructions.
 	\item \textbf{Device} - Graphics Processing Unit (GPU) and its memory. The device executes specialized instructions provided by the host.
-	\item \textbf{Kernel} - the term used for a special type of function that, unlike regular functions, can only be called from the host and executed on the device. Furthermore, when a CUDA kernel is called it is executed in parallel across several threads.	
+	\item \textbf{Kernel} - the term used for a special type of function that, unlike regular functions, can only be called from the host and executed on the device. Furthermore, when a CUDA kernel is called it can be executed in parallel across several threads.	
 \end{itemize}
 
 \subsection{Thread Management}\label{Subsection:thread-management}
@@ -152,12 +152,12 @@ In this project, the terms "CUDA thread" and "thread" will be used interchangeab
 \end{figure}
 
 \paragraph{Warp}\label{Paragraph:theory-CUDA-thread-management-warp}
-To execute thousands of threads simultaneously, SMs of an Nvidia GPU use the Single-Instruction Multiple-Thread (SIMT) execution model. The abbreviation SIMT comes from the amalgamation of SIMD (Single-Instruction Multiple-Data) and multi-threading (executing multiple sequences of instructions simultaneously). Specifically, this approach consists of multiple threads executing the same computations on different data items \cite{Marziale2010}. In terms of CUDA, the core of the SIMT architecture is a so-called "warp" that is made up of 32 threads. In other words, the smallest number of threads that can be executed simultaneously is 32. If fewer threads are required, for example, only one thread, then CUDA will still allocate 32 threads with 31 being inactive. Similarly, some threads of a warp are to execute different instructions (e.g., as a result of a conditional statement) then the different sets of instructions are executed serially across their respective threads - this issue is known as "thread divergence". An example of thread divergence can be seen in Figure~\ref{Figure:theory-CUDA-warp-thread-divergence}; the warp in the example is simplified for the explanation and as such contains only 8 threads.
+To execute thousands of threads simultaneously, SMs of an Nvidia GPU use the Single-Instruction Multiple-Thread (SIMT) execution model. The abbreviation SIMT comes from the amalgamation of SIMD (Single-Instruction Multiple-Data) and multi-threading (executing multiple sequences of instructions simultaneously). Specifically, this approach consists of multiple threads executing the same computations on different data items \cite{Marziale2010}. In terms of CUDA, the core of the SIMT architecture is a so-called "warp" that is made up of 32 threads. In other words, the smallest number of threads that can be executed simultaneously is 32. If fewer threads are required, for example, only one thread, then CUDA will still allocate 32 threads with 31 being inactive. Similarly, if some threads of a warp are to execute different instructions (e.g., as a result of a conditional statement) then the different sets of instructions are executed serially across their respective threads - this issue is known as "thread divergence". An example of thread divergence can be seen in Figure~\ref{Figure:theory-CUDA-warp-thread-divergence}; the warp in the example is simplified for the explanation and as such contains only 8 threads.
 
 \begin{figure}[ht!]
 	\centering
 	\includegraphics[width=14cm, keepaspectratio]{images/ch1/CUDA_warp_divergence_execution_path.jpg}
-	\caption{Conditional code execution by a warp of 8 threads; each thread is represented by one wavy line. Due to the condition, threads with an ID between \code{0} and \code{3} will only execute statements \code{A} and \code{B}. However, simultaneously, threads with IDs between \code{4} and \code{7} will be put on hold. Comparably, while threads with IDs between \code{4} and \code{7} will be executing statements \code{X} and \code{Y}, the remaining threads will be idle. Thus, thread divergence has occurred within the 8-thread warp. Taken from Nvidia's developer blog post: \emph{Inside Volta: The World's Most Advanced Data Center GPU} \cite{Durant10May2017}.}
+	\caption{Conditional code execution by a warp of 8 threads; each thread is represented by one wavy line. Due to the condition, threads with an ID between \code{0} and \code{3} will only execute statements \code{A}, \code{B}, and \code{Z}. However, simultaneously, threads with IDs between \code{4} and \code{7} will be put on hold. Comparably, while threads with IDs between \code{4} and \code{7} will be executing statements \code{X} and \code{Y}, the remaining threads will be idle. Thus, thread divergence has occurred within the 8-thread warp. Taken from Nvidia's developer blog post: \emph{Inside Volta: The World's Most Advanced Data Center GPU} \cite{Durant10May2017}.}
 	\label{Figure:theory-CUDA-warp-thread-divergence}
 \end{figure}
 

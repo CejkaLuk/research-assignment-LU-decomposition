@@ -290,7 +290,7 @@ While the previous part detailed how an entire matrix is processed by sections, 
 	\item Given input matrices $ \mathbb{A} $ and $ \mathbb{Z}^t $ calculate the next iteration of a specific submatrix: $ \mathbb{Z}^{t+1}_{sub} $:
 		\begin{align}
 			z_{ij}^{t+1} &= a_{ij} - \sum_{k=1}^{j-1}z_{ik}^{t}z_{kj}^{t}                                                              &\quad i \geq j \nonumber\,, \\
-			z_{ij}^{t+1} &= \frac{1}{z_{ii}^{t}} \left ( z_{ij} - \sum_{k=1}^{i-1}z_{ik}^{t}z_{kj}^{t} \right ) &\quad i < j \nonumber\,.\\
+			z_{ij}^{t+1} &= \frac{1}{z_{ii}^{t}} \left ( a_{ij} - \sum_{k=1}^{i-1}z_{ik}^{t}z_{kj}^{t} \right ) 					   &\quad i < j \nonumber\,.
 		\end{align}
 	\item Check if the section has been processed according to the tolerance rule: $ \left | \mathbb{Z}^{t+1}_{sub} - \mathbb{Z}^{t}_{sub} \right | > tol $ (where $ tol $ is some hard-set value, for example, 0.0001). If the tolerance rule has not passed, then go back to step 2.
 	\item If the tolerance rule has passed, then the algorithm has arrived at an approximate solution of a submatrix in $ \mathbb{L}\mathbb{U} $ (stored in $ \mathbb{Z} $).
